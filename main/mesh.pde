@@ -763,9 +763,9 @@ Mesh loadMeshVTS(String fn) {
     return Q;
     }
  
-  void drawClosestProjections(Curve L) {
+  /* void drawClosestProjections(Curve L) {
     for (int p=0; p<L.n; p++) {drawLineToClosestProjection(L.P[p]);};  
-    }
+    } */
     
   
  void drawLineToClosestProjection(pt P) {

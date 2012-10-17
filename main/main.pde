@@ -14,18 +14,8 @@ Boolean
   showMesh=true,
   translucent=false,   
   showSilhouette=true, 
-  showNMBE=true,
-  showSpine=true,
-  showControl=true,
-  showTube=true,
-  showFrenetQuads=false,
-  showFrenetNormal=false,
-  filterFrenetNormal=true,
-  showTwistFreeNormal=false, 
   showHelpText=false; 
 
-// String SCC = "-"; // info on current corner
-   
 // ****************************** VIEW PARAMETERS *******************************************************
 pt F = P(0,0,0); pt T = P(0,0,0); pt E = P(0,0,1000); vec U=V(0,1,0);  // focus  set with mouse when pressing ';', eye, and up vector
 pt Q=P(0,0,0); vec I=V(1,0,0); vec J=V(0,1,0); vec K=V(0,0,1); // picked surface point Q and screen aligned vectors {I,J,K} set when picked
@@ -34,14 +24,7 @@ void initView() {Q=P(0,0,0); I=V(1,0,0); J=V(0,1,0); K=V(0,0,1); F = P(0,0,0); E
 // ******************************** MESHES ***********************************************
 Mesh M=new Mesh(); // meshes for models M0 and M1
 
-float volume1=0, volume0=0;
 float sampleDistance=1;
-// ******************************** CURVES & SPINES ***********************************************
-Curve C0 = new Curve(5), S0 = new Curve(), C1 = new Curve(5), S1 = new Curve();  // control points and spines 0 and 1
-Curve C= new Curve(11,130,P());
-int nsteps=250; // number of smaples along spine
-float sd=10; // sample distance for spine
-pt sE = P(), sF = P(); vec sU=V(); //  view parameters (saved with 'j'
 
 // *******************************************************************************************************************    SETUP
 void setup() {
@@ -55,11 +38,7 @@ void setup() {
   // ***************** Load meshes
   M.declareVectors().loadMeshVTS("data/horse.vts");
   M.resetMarkers().computeBox().updateON(); // makes a cube around C[8]
-  // ***************** Load Curve
-  C.loadPts();
-  
-  // ***************** Set view
- 
+
   F=P(); E=P(0,0,500);
   for(int i=0; i<10; i++) vis[i]=true; // to show all types of triangles
   }
@@ -80,31 +59,6 @@ void draw() {
   vec Li=U(A(V(E,F),0.1*d(E,F),J));   // vec Li=U(A(V(E,F),-d(E,F),J)); 
   directionalLight(255,255,255,Li.x,Li.y,Li.z); // direction of light: behind and above the viewer
   specular(255,255,0); shininess(5);
-  
-  // -------------------------- display and edit control points of the spines and box ----------------------------------   
-    if(pressed) {
-     if (keyPressed&&(key=='a'||key=='s')) {
-       fill(white,0); noStroke(); if(showControl) C.showSamples(20);
-       C.pick(Pick());
-       }
-     }
-     
-  // -------------------------------------------------------- create control curves  ----------------------------------   
-   C0.empty().append(C.Pof(0)).append(C.Pof(1)).append(C.Pof(2)).append(C.Pof(3)).append(C.Pof(4)); 
-
-   // -------------------------------------------------------- create and show spines  ----------------------------------   
-   S0=S0.makeFrom(C0,500).resampleDistance(sampleDistance);
-   stroke(blue); noFill(); if(showSpine) S0.drawEdges(); 
-   
-   // -------------------------------------------------------- compute spine normals  ----------------------------------   
-   S0.prepareSpine(0);
-  
-   // -------------------------------------------------------- show tube ----------------------------------   
-   if(showTube) S0.showTube(10,4,10,orange); 
-   
-   // -------------------------------------------------------- create and move mesh ----------------------------------   
-   pt Q0=C.Pof(10); fill(red); show(Q0,4);
-   M.moveTo(Q0);
   
      // -------------------------------------------------------- show mesh ----------------------------------   
    if(showMesh) { fill(yellow); if(M.showEdges) stroke(white);  else noStroke(); M.showFront();} 
@@ -132,9 +86,7 @@ void draw() {
    
   // -------------------------------------------------------- Disable z-buffer to display occluded silhouettes and other things ---------------------------------- 
   hint(DISABLE_DEPTH_TEST);  // show on top
-  stroke(black); if(showControl) {C0.showSamples(2);}
   if(showMesh&&showSilhouette) {stroke(dbrown); M.drawSilhouettes(); }  // display silhouettes
-  strokeWeight(2); stroke(red);if(showMesh&&showNMBE) M.showMBEs();  // manifold borders
   camera(); // 2D view to write help text
   writeFooterHelp();
   hint(ENABLE_DEPTH_TEST); // show silouettes
@@ -152,10 +104,6 @@ Boolean pressed=false;
 void mousePressed() {pressed=true; }
   
 void mouseDragged() {
-  if(keyPressed&&key=='a') {C.dragPoint( V(.5*(mouseX-pmouseX),I,.5*(mouseY-pmouseY),K) ); } // move selected vertex of curve C in screen plane
-  if(keyPressed&&key=='s') {C.dragPoint( V(.5*(mouseX-pmouseX),I,-.5*(mouseY-pmouseY),J) ); } // move selected vertex of curve C in screen plane
-  if(keyPressed&&key=='b') {C.dragAll(0,5, V(.5*(mouseX-pmouseX),I,.5*(mouseY-pmouseY),K) ); } // move selected vertex of curve C in screen plane
-  if(keyPressed&&key=='v') {C.dragAll(0,5, V(.5*(mouseX-pmouseX),I,-.5*(mouseY-pmouseY),J) ); } // move selected vertex of curve Cb in XZ
   if(keyPressed&&key=='x') {M.add(float(mouseX-pmouseX),I).add(-float(mouseY-pmouseY),J); M.normals();} // move selected vertex in screen plane
   if(keyPressed&&key=='z') {M.add(float(mouseX-pmouseX),I).add(float(mouseY-pmouseY),K); M.normals();}  // move selected vertex in X/Z screen plane
   if(keyPressed&&key=='X') {M.addROI(float(mouseX-pmouseX),I).addROI(-float(mouseY-pmouseY),J); M.normals();} // move selected vertex in screen plane
@@ -173,36 +121,36 @@ void keyReleased() {
 
  
 void keyPressed() {
-  if(key=='a') {} // drag curve control point in xz (mouseDragged)
-  if(key=='b') {}  // move S2 in XZ
-  if(key=='c') {} // load curve
+  if(key=='a') {}
+  if(key=='b') {}
+  if(key=='c') {}
   if(key=='d') {} 
   if(key=='e') {}
-  if(key=='f') {filterFrenetNormal=!filterFrenetNormal; if(filterFrenetNormal) println("Filtering"); else println("not filtering");}
-  if(key=='g') {} // change global twist w (mouseDrag)
-  if(key=='h') {} // hide picked vertex (mousePressed)
+  if(key=='f') {}
+  if(key=='g') {}
+  if(key=='h') {}
   if(key=='i') {}
   if(key=='j') {}
   if(key=='k') {}
   if(key=='l') {}
   if(key=='m') {showMesh=!showMesh;}
-  if(key=='n') {showNMBE=!showNMBE;}
+  if(key=='n') {}
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {}
   if(key=='r') {}
-  if(key=='s') {} // drag curve control point in xz (mouseDragged)
-  if(key=='t') {showTube=!showTube;}
+  if(key=='s') {}
+  if(key=='t') {}
   if(key=='u') {}
-  if(key=='v') {} // move S2
+  if(key=='v') {}
   if(key=='w') {}
   if(key=='x') {} // drag mesh vertex in xy (mouseDragged)
   if(key=='y') {}
   if(key=='z') {} // drag mesh vertex in xz (mouseDragged)
    
-  if(key=='A') {C.savePts();}
+  if(key=='A') {}
   if(key=='B') {}
-  if(key=='C') {C.loadPts();} // save curve
+  if(key=='C') {}
   if(key=='D') {} //move in depth without rotation (draw)
   if(key=='E') {M.smoothen(); M.normals();}
   if(key=='F') {}
@@ -228,27 +176,27 @@ void keyPressed() {
   if(key=='Z') {} // drag mesh vertex in xz and neighbors (mouseDragged)
 
   if(key=='`') {M.perturb();}
-  if(key=='~') {showSpine=!showSpine;}
+  if(key=='~') {}
   if(key=='!') {snapping=true;}
   if(key=='@') {}
   if(key=='#') {}
-  if(key=='$') {M.moveTo(C.Pof(10));} // ???????
+  if(key=='$') {}
   if(key=='%') {}
   if(key=='&') {}
-  if(key=='*') {sampleDistance*=2;}
+  if(key=='*') {}
   if(key=='(') {}
   if(key==')') {showSilhouette=!showSilhouette;}
   if(key=='_') {M.flatShading=!M.flatShading;}
   if(key=='+') {M.flip();} // flip edge of M
   if(key=='-') {M.showEdges=!M.showEdges;}
-  if(key=='=') {C.P[5].set(C.P[0]); C.P[6].set(C.P[1]); C.P[7].set(C.P[2]); C.P[8].set(C.P[3]); C.P[9].set(C.P[4]);}
-  if(key=='{') {showFrenetQuads=!showFrenetQuads;}
+  if(key=='=') {}
+  if(key=='{') {}
   if(key=='}') {}
   if(key=='|') {}
   if(key=='[') {initView(); F.set(M.Cbox); E.set(P(F,M.rbox*2,K));}
   if(key==']') {F.set(M.Cbox);}
   if(key==':') {translucent=!translucent;}
-  if(key==';') {showControl=!showControl;}
+  if(key==';') {}
   if(key=='<') {}
   if(key=='>') {if (shrunk==0) shrunk=1; else shrunk=0;}
   if(key=='?') {showHelpText=!showHelpText;}
@@ -258,7 +206,6 @@ void keyPressed() {
   if(key=='/') {} 
   //if(key==' ') {} // pick focus point (will be centered) (draw & keyReleased)
 
-  if(key=='0') {w=0;}
 //  for(int i=0; i<10; i++) if (key==char(i+48)) vis[i]=!vis[i];
   
   } //------------------------------------------------------------------------ end keyPressed

@@ -2,12 +2,12 @@ float collision_time(Ball A, vec V, Ball B) {
 	vec B_prime = V(B.c, A.c);
 
 	float a = V.norm2(),
-	      b = d(V, b_prime),
+	      b = d(V, B_prime),
 	      c = B_prime.norm2() - sq(A.r+B.r);
 
 	float disc = sq(b) - 4*a*c;
 	if (disc < 0) {
-		return NaN;
+		return 0/0;
 	}
 	else {
 		return (-b-sqrt(disc))/2/a;
@@ -17,7 +17,7 @@ float collision_time(Ball A, vec V, Ball B) {
 vec rot_angle_axis(vec V, float angle, vec axis) {
 	float cos_a = cos(angle);
 	vec ret = V(cos_a,V);
-	ret.add(U(axis,V).mul(sin(angle)));
+	ret.add(N(axis,V).mul(sin(angle)));
 	ret.add(V(d(axis,V)*(1-cos_a),axis));
 	return ret;
 }
@@ -66,7 +66,9 @@ ArrayList<vec> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
 	vec norm_axis = N(U(A.c, B.c), U(A.c, C.c));
 	vec M = rot_angle_axis(V(A.c, B.c), MAB, norm_axis);
 
-	ArrayList <vec> ret = new ArrayList();
+	ArrayList<vec> ret = new ArrayList();
 	ret.add(A(M,  height, norm_axis));
 	ret.add(A(M, -height, norm_axis));
+
+	return ret;
 }
