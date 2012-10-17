@@ -17,7 +17,8 @@ class vec { float x=0,y=0,z=0;
    vec div(float f) {x/=f; y/=f; z/=f; return this;};
    vec div(int f) {x/=f; y/=f; z/=f; return this;};
    vec rev() {x=-x; y=-y; z=-z; return this;};
-   float norm() {return(sqrt(sq(x)+sq(y)+sq(z)));}; 
+   float norm() {return(sqrt(sq(x)+sq(y)+sq(z)));};
+   float norm2() {return(sq(x)+sq(y)+sq(z));};
    vec normalize() {float n=norm(); if (n>0.000001) {div(n);}; return this;};
    vec rotate(float a, vec I, vec J) {float x=d(this,I), y=d(this,J); float c=cos(a), s=sin(a); add(x*c-x-y*s,I); add(x*s+y*c-y,J); return this; }; // Rotate by a in plane (I,J)
    } ;
