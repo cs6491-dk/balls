@@ -1,6 +1,15 @@
+class Hit{
+	float min_t;
+	Ball min_A;
+	int min_Adx;
+}
+
+
 class Sculpture {
+	
 	ArrayList<Ball> Balls;
 	float r=20;
+
 
 	Sculpture() {
 		Balls = new ArrayList();
@@ -15,31 +24,49 @@ class Sculpture {
 			Balls.get(i).show();
 		}
 	}
+  void deleteBall(pt E, pt F){
+    Ball D = new Ball(P(E), r);
+    vec V = V(E, F);
 
-	void addBall(pt E, pt F) {
-		Ball D = new Ball(P(E), r);
-		vec V = V(E, F);
+    Hit hit = findFirstHit(V, D);      
+    println("delete " + hit.min_Adx);    
+    Balls.remove(hit.min_Adx);
 
+  }
+  Hit findFirstHit(vec V, Ball D){
+    Ball A;
+    float t=1e10;
+    Hit retval = new Hit();
+    retval.min_t = 1e10;
+					
 		/* find the first ball hit */
-		float t, min_t = 1e10;
-		Ball A, min_A = null;
-		int Adx, min_Adx = -1;
 		for (int i=0; i < Balls.size(); i++) {
 			A = Balls.get(i);
 			t = sphere_collision_time(A, V, D);
-			if ((0 < t) && (t < min_t)) {
-				min_t = t;
-				min_A = A;
-				min_Adx = i;
+			if ((0 < t) && (t < retval.min_t)) {
+				retval.min_t = t;
+				retval.min_A = A;
+				retval.min_Adx = i;
 			}
-		}
-		if (min_A == null) {
+		} 
+						return retval;
+  }      
+
+	void addBall(pt E, pt F) {
+		int Adx, min_Adx = -1;
+								Ball A;
+		Ball D = new Ball(P(E), r);
+		vec V = V(E, F);
+
+								Hit hit = findFirstHit(V, D);
+
+		if (hit.min_A == null) {
 			println("Bad shot");
 			return;
 		}
-		D.move(min_t, V);
-		A = min_A;
-		Adx = min_Adx;
+		D.move(hit.min_t, V);
+		A = hit.min_A;
+		Adx = hit.min_Adx;
 
 		/* roll the new sphere into place */
 		Ball B, C;

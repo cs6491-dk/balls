@@ -129,7 +129,7 @@ void keyPressed() {
   if(key=='a') {}
   if(key=='b') {showBalls=!showBalls;}
   if(key=='c') {}
-  if(key=='d') {} 
+  if(key=='d') {S.deleteBall(E, F);} 
   if(key=='e') {}
   if(key=='f') {}
   if(key=='g') {}
