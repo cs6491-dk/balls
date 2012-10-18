@@ -1,13 +1,15 @@
-float collision_time(Ball A, vec V, Ball B) {
-	vec B_prime = V(B.c, A.c);
+float sphere_collision_time(Ball A, vec V, Ball B) {
+	/* A collides with B+V*t */
+
+	vec B_prime = V(A.c, B.c);
 
 	float a = V.norm2(),
-	      b = d(V, B_prime),
+	      b = 2*d(V, B_prime),
 	      c = B_prime.norm2() - sq(A.r+B.r);
 
 	float disc = sq(b) - 4*a*c;
 	if (disc < 0) {
-		return 0/0;
+		return Float.NaN;
 	}
 	else {
 		return (-b-sqrt(disc))/2/a;

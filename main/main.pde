@@ -10,8 +10,9 @@ GL gl;
 GLU glu; 
 
 // ****************************** GLOBAL VARIABLES FOR DISPLAY OPTIONS *********************************
-Boolean 
-  showMesh=true,
+Boolean
+  showBalls=true,
+  showMesh=false,
   translucent=false,   
   showSilhouette=true, 
   showHelpText=false; 
@@ -23,13 +24,14 @@ void initView() {Q=P(0,0,0); I=V(1,0,0); J=V(0,1,0); K=V(0,0,1); F = P(0,0,0); E
 
 // ******************************** MESHES ***********************************************
 Mesh M=new Mesh(); // meshes for models M0 and M1
+Sculpture S = new Sculpture();
 
 float sampleDistance=1;
 
 // *******************************************************************************************************************    SETUP
 void setup() {
   size(800, 800, OPENGL);  
-  setColors(); sphereDetail(6); 
+  setColors(); sphereDetail(20);
   PFont font = loadFont("GillSans-24.vlw"); textFont(font, 20);  // font for writing labels on //  PFont font = loadFont("Courier-14.vlw"); textFont(font, 12); 
   // ***************** OpenGL and View setup
   glu= ((PGraphicsOpenGL) g).glu;  PGraphicsOpenGL pgl = (PGraphicsOpenGL) g;  gl = pgl.beginGL();  pgl.endGL();
@@ -59,7 +61,10 @@ void draw() {
   vec Li=U(A(V(E,F),0.1*d(E,F),J));   // vec Li=U(A(V(E,F),-d(E,F),J)); 
   directionalLight(255,255,255,Li.x,Li.y,Li.z); // direction of light: behind and above the viewer
   specular(255,255,0); shininess(5);
-  
+
+     // -------------------------------------------------------- show balls ---------------------------------
+   if(showBalls) S.showBalls();
+
      // -------------------------------------------------------- show mesh ----------------------------------   
    if(showMesh) { fill(yellow); if(M.showEdges) stroke(white);  else noStroke(); M.showFront();} 
    
@@ -122,7 +127,7 @@ void keyReleased() {
  
 void keyPressed() {
   if(key=='a') {}
-  if(key=='b') {}
+  if(key=='b') {showBalls=!showBalls;}
   if(key=='c') {}
   if(key=='d') {} 
   if(key=='e') {}
@@ -139,7 +144,7 @@ void keyPressed() {
   if(key=='p') {}
   if(key=='q') {}
   if(key=='r') {}
-  if(key=='s') {}
+  if(key=='s') { S.addBall(E, F);}
   if(key=='t') {}
   if(key=='u') {}
   if(key=='v') {}
