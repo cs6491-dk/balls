@@ -13,7 +13,7 @@ spheres at which points it stops
 Detailed Requirements:
  * ~~Write a 3D interactive sculpting program.~~
  * ~~Start with an initial set of small balls, maybe filling in a large ball.~~
- * ~~Write code that let’s the user point with the mouse and spray small balls around the designated surface point. ~~
+ * ~~Write code that let’s the user point with the mouse and spray small balls around the designated surface point.~~
  * ~~The balls should stick to the surface of the first ball they hit, roll on it away from the viewer until they hit another ball, and then roll on contact with these two until they reach a corner where they are in contact with 3 balls. Alternatively, you may directly compute that 3-ball intersection involving the ball you pointed to and go there.~~
  * Design an interface where as the mouse is pressed, it generates one new ball per frame. 
  * Explore alternatives where several balls are generated (in some cone of directions) of where several balls are placed in nearby corners.
