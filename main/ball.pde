@@ -14,6 +14,10 @@ class Ball {
 		popMatrix();
 	}
 
+	void move(pt C) {
+		c = P(C);
+	}
+
 	void move(float t, vec V) {
 		c.add(t, V);
 	}

@@ -16,15 +16,16 @@ float sphere_collision_time(Ball A, vec V, Ball B) {
 	}
 }
 
-vec rot_angle_axis(vec V, float angle, vec axis) {
+pt rot_angle_axis(pt P, float angle, vec axis) {
+	vec V = V(P);
 	float cos_a = cos(angle);
-	vec ret = V(cos_a,V);
+	pt ret = P(cos_a,P);
 	ret.add(N(axis,V).mul(sin(angle)));
 	ret.add(V(d(axis,V)*(1-cos_a),axis));
 	return ret;
 }
 
-ArrayList<vec> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
+ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
 	/*vec AB = V(A.c, B.c),
 	    AC = V(A.c, C.c),
 	    BC = V(B.c, C.c);
@@ -65,12 +66,12 @@ ArrayList<vec> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
 	float MAB = atan2(s, M_AB_x);
 
 	/* Apply to actual sphere locations */
-	vec norm_axis = N(U(A.c, B.c), U(A.c, C.c));
-	vec M = rot_angle_axis(V(A.c, B.c), MAB, norm_axis);
+	vec norm_axis = N(U(A.c, B.c), U(A.c, C.c)).normalize();
+	pt M = A(A.c, rot_angle_axis(P(0,0,0).add(len_M, V(A.c,B.c).normalize()), MAB, norm_axis));
 
-	ArrayList<vec> ret = new ArrayList();
-	ret.add(A(M,  height, norm_axis));
-	ret.add(A(M, -height, norm_axis));
+	ArrayList<pt> ret = new ArrayList();
+	ret.add(P(M,  height, norm_axis));
+	ret.add(P(M, -height, norm_axis));
 
 	return ret;
 }

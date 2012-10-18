@@ -27,6 +27,7 @@ class vec { float x=0,y=0,z=0;
 vec V() {return new vec(); };                                                                          // make vector (x,y,z)
 vec V(float x, float y, float z) {return new vec(x,y,z); };                                            // make vector (x,y,z)
 vec V(vec V) {return new vec(V.x,V.y,V.z); };                                                          // make copy of vector V
+vec V(pt P) {return new vec(P.x,P.y,P.z); };
 vec A(vec A, vec B) {return new vec(A.x+B.x,A.y+B.y,A.z+B.z); };                                       // A+B
 vec A(vec U, float s, vec V) {return V(U.x+s*V.x,U.y+s*V.y,U.z+s*V.z);};                               // U+sV
 vec M(vec U, vec V) {return V(U.x-V.x,U.y-V.y,U.z-V.z);};                                              // U-V
