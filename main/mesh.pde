@@ -723,24 +723,20 @@ Mesh loadMeshVTS(String fn) {
   String [] ss = loadStrings(fn);
   String subpts;
   int s=0;   int comma1, comma2;   float x, y, z;   int a, b, c;
-  nv = int(ss[s++]);
+  nv = int(ss[s++]); // number of vertices is first line
     println("nv="+nv);
-    for(int k=0; k<nv; k++) {int i=k+s; 
-      comma1=ss[i].indexOf(',');   
-      x=float(ss[i].substring(0, comma1));
-      String rest = ss[i].substring(comma1+1, ss[i].length());
-      comma2=rest.indexOf(',');    y=float(rest.substring(0, comma2)); z=float(rest.substring(comma2+1, rest.length()));
-      G[k].set(x,y,z);
+    for(int k=0; k<nv; k++) {
+      int i=k+s;
+      String [] xyz = ss[i].split(",");
+      G[k].set(float(xyz[0]),float(xyz[1]),float(xyz[2]));
       };
   s=nv+1;
   nt = int(ss[s]); nc=3*nt;
   println("nt="+nt);
   s++;
   for(int k=0; k<nt; k++) {int i=k+s;
-      comma1=ss[i].indexOf(',');   a=int(ss[i].substring(0, comma1));  
-      String rest = ss[i].substring(comma1+1, ss[i].length()); comma2=rest.indexOf(',');  
-      b=int(rest.substring(0, comma2)); c=int(rest.substring(comma2+1, rest.length()));
-      V[3*k]=a;  V[3*k+1]=b;  V[3*k+2]=c;
+      String[] abc = ss[i].split(",");
+      V[3*k]=int(abc[0]);  V[3*k+1]=int(abc[1]);  V[3*k+2]=int(abc[2]);
     }
   println("done loading");
   return this;  
