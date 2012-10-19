@@ -51,9 +51,42 @@ class Sculpture {
 		} 
 						return retval;
   }      
+  pt rollBall(Ball A, Ball D, int Adx){
 
+		/* roll the new sphere into place */
+    Ball B, C;
+    float a, min_a = TWO_PI;
+    pt sol, min_sol = null;
+    ArrayList<pt> sols;
+    for (int Bdx=0; Bdx < Balls.size(); Bdx++) {
+      if (Bdx != Adx) {
+        B = Balls.get(Bdx);
+        if (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) < 1e-3) {
+          for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
+            if (Cdx != Adx) {
+              C = Balls.get(Cdx);
+              if ((abs(V(A.c, C.c).norm2() - sq(A.r+B.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
+                sols = sphere_pack(A, B, C, D.r);
+                for (int i=0; i < sols.size(); i++) {
+                  sol = sols.get(i);
+                  a = angle(V(A.c, sol), V(A.c, D.c));
+                  if (a < min_a) {
+                    min_a = a;
+                    min_sol = sol;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+      return min_sol;
+    
+  }
 	void addBall(pt E, pt F) {
 		int Adx, min_Adx = -1;
+pt min_sol;
 								Ball A;
 		Ball D = new Ball(P(E), r);
 		vec V = V(E, F);
@@ -68,35 +101,8 @@ class Sculpture {
 		A = hit.min_A;
 		Adx = hit.min_Adx;
 
-		/* roll the new sphere into place */
-		Ball B, C;
-		float a, min_a = TWO_PI;
-		pt sol, min_sol = null;
-		ArrayList<pt> sols;
-		for (int Bdx=0; Bdx < Balls.size(); Bdx++) {
-			if (Bdx != Adx) {
-				B = Balls.get(Bdx);
-				if (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) < 1e-3) {
-					for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
-						if (Cdx != Adx) {
-							C = Balls.get(Cdx);
-							if ((abs(V(A.c, C.c).norm2() - sq(A.r+B.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
-								sols = sphere_pack(A, B, C, D.r);
-								for (int i=0; i < sols.size(); i++) {
-									sol = sols.get(i);
-									a = angle(V(A.c, sol), V(A.c, D.c));
-									if (a < min_a) {
-										min_a = a;
-										min_sol = sol;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		if (min_sol == null) {
+		min_sol = rollBall(A, D, Adx);
+    if (min_sol == null) {
 			println("No kisses");
 			return;
 		}
