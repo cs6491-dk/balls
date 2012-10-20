@@ -84,22 +84,75 @@ class Sculpture {
       return min_sol;
     
   }
+
+  void triangulate(pt E, pt F){
+    // triangulate by creating a large ball and rolling it around the
+    // cluster of spheres
+    int Adx, min_Adx = -1;
+    Ball A;
+    pt min_sol;
+
+    // add a large ball
+    Ball roller = new Ball(P(E), r*2);
+    vec V = V(E,F);
+
+    // find the hit point 
+    Hit hit = findFirstHit(V, roller);
+    if (hit.min_A == null) {
+      println("Bad shot");
+      return;
+    }
+
+    // do the inital roll
+    roller.move(hit.min_t, V);
+    A = hit.min_A;
+    Adx = hit.min_Adx;
+    min_sol = rollBall(A, roller, Adx);
+    if (min_sol == null) {
+      println("No kisses");
+      return;
+    }
+    roller.move(min_sol);
+    Balls.add(roller);
+
+    // create the first triangle
+    
+    M.declareVectors();
+    M.nv = 5;
+    M.G[0].set(124.8207,1.777773,9.47427);
+    M.G[1].set(193.10881,23.87775,10.50819);
+    M.G[2].set(-57.601803,169.47241,-87.9093);
+    M.G[3].set(-66.3798,120.499794,-105.5466);
+    M.G[4].set(83.9652,39.7743,-5.67807);
+    M.nt = 3;
+    M.nc = 3*M.nt;
+    M.V[0] = int(2);
+    M.V[1] = int(4);
+    M.V[2] = int(3);
+
+    //M.loadMeshVTS("data/horse2.vts");
+    M.resetMarkers().updateON();
+    M.makeAllVisible();
+    //M.resetMarkers().computeBox().updateON(); // makes a cube around C[8]
+    
+  }
+
 	void addBall(pt E, pt F) {
 		int Adx, min_Adx = -1;
-pt min_sol;
-								Ball A;
-		Ball D = new Ball(P(E), r);
-		vec V = V(E, F);
+    pt min_sol;
+    Ball A;
+    Ball D = new Ball(P(E), r);
+    vec V = V(E, F);
 
-								Hit hit = findFirstHit(V, D);
+    Hit hit = findFirstHit(V, D);
 
-		if (hit.min_A == null) {
-			println("Bad shot");
-			return;
-		}
-		D.move(hit.min_t, V);
-		A = hit.min_A;
-		Adx = hit.min_Adx;
+    if (hit.min_A == null) {
+      println("Bad shot");
+      return;
+    }
+    D.move(hit.min_t, V);
+    A = hit.min_A;
+    Adx = hit.min_Adx;
 
 		min_sol = rollBall(A, D, Adx);
     if (min_sol == null) {
@@ -107,7 +160,6 @@ pt min_sol;
 			return;
 		}
 		D.move(min_sol);
-
 		Balls.add(D);
 	}
 }

@@ -38,10 +38,11 @@ void setup() {
   initView(); // declares the local frames for 3D GUI
 
   // ***************** Load meshes
-  M.declareVectors().loadMeshVTS("data/horse.vts");
-  M.resetMarkers().computeBox().updateON(); // makes a cube around C[8]
+  //M.declareVectors();
+  //M.declareVectors().loadMeshVTS("data/horse.vts");
+  //M.resetMarkers().computeBox().updateON(); // makes a cube around C[8]
 
-  F=P(); E=P(0,0,500);
+  F=P(); E=P(10,0,500);
   for(int i=0; i<10; i++) vis[i]=true; // to show all types of triangles
   }
   
@@ -64,9 +65,10 @@ void draw() {
 
      // -------------------------------------------------------- show balls ---------------------------------
    if(showBalls) S.showBalls();
+   fill(black);
 
      // -------------------------------------------------------- show mesh ----------------------------------   
-   if(showMesh) { fill(yellow); if(M.showEdges) stroke(white);  else noStroke(); M.showFront();} 
+   if(showMesh) { fill(yellow); if(M.showEdges) stroke(red);  else noStroke(); M.showFront();} 
    
     // -------------------------- pick mesh corner ----------------------------------   
    if(pressed) if (keyPressed&&(key=='.')) M.pickc(Pick());
@@ -82,7 +84,10 @@ void draw() {
      }
  
   // -------------------------------------------------------- graphic picking on surface and view control ----------------------------------   
-  if (keyPressed&&key==' ') T.set(Pick()); // sets point T on the surface where the mouse points. The camera will turn toward's it when the ';' key is released
+    if (keyPressed&&key==' ') {
+      println("yo");
+      T.set(Pick()); // sets point T on the surface where the mouse points. The camera will turn toward's it when the ';' key is released
+    }
   SetFrame(Q,I,J,K);  // showFrame(Q,I,J,K,30);  // sets frame from picked points and screen axes
   // rotate view 
   if(!keyPressed&&mousePressed) {E=R(E,  PI*float(mouseX-pmouseX)/width,I,K,F); E=R(E,-PI*float(mouseY-pmouseY)/width,J,K,F); } // rotate E around F 
@@ -120,7 +125,9 @@ void mouseReleased() {
     }
   
 void keyReleased() {
-   if(key==' ') F=P(T);                           //   if(key=='c') M0.moveTo(C.Pof(10));
+  // F is a pt, P is a shortcut to construct a new point
+  
+   if(key==' ') F=P(T);                          
    U.set(M(J)); // reset camera up vector
    } 
 
@@ -129,7 +136,7 @@ void keyPressed() {
   if(key=='a') {}
   if(key=='b') {showBalls=!showBalls;}
   if(key=='c') {}
-  if(key=='d') {S.deleteBall(E, F);} 
+  if(key=='d') {E.z -= 100;} 
   if(key=='e') {}
   if(key=='f') {}
   if(key=='g') {}
@@ -143,9 +150,9 @@ void keyPressed() {
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {}
-  if(key=='r') {}
-  if(key=='s') { S.addBall(E, F);}
-  if(key=='t') {}
+  if(key=='r') {S.deleteBall(E, F);}
+  if(key=='s') {S.addBall(E, F);}
+  if(key=='t') {S.triangulate(E, F);}
   if(key=='u') {}
   if(key=='v') {}
   if(key=='w') {}
@@ -156,7 +163,7 @@ void keyPressed() {
   if(key=='A') {}
   if(key=='B') {}
   if(key=='C') {}
-  if(key=='D') {} //move in depth without rotation (draw)
+  if(key=='D') {E.z += 100;} //move in depth without rotation (draw)
   if(key=='E') {M.smoothen(); M.normals();}
   if(key=='F') {}
   if(key=='G') {}
