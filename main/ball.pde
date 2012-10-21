@@ -1,6 +1,7 @@
 class Ball {
 	pt c;
 	float r;
+        int vtx = -1; //vtx
 
 	Ball(pt arg_c, float arg_r) {
 		c = arg_c;
@@ -21,4 +22,7 @@ class Ball {
 	void move(float t, vec V) {
 		c.add(t, V);
 	}
+        String toString(){
+          return c.toString() + "vtx: " + vtx;
+        }
 }

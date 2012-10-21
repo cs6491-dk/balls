@@ -85,7 +85,6 @@ void draw() {
  
   // -------------------------------------------------------- graphic picking on surface and view control ----------------------------------   
     if (keyPressed&&key==' ') {
-      println("yo");
       T.set(Pick()); // sets point T on the surface where the mouse points. The camera will turn toward's it when the ';' key is released
     }
   SetFrame(Q,I,J,K);  // showFrame(Q,I,J,K,30);  // sets frame from picked points and screen axes
@@ -152,7 +151,7 @@ void keyPressed() {
   if(key=='q') {}
   if(key=='r') {S.deleteBall(E, F);}
   if(key=='s') {S.addBall(E, F);}
-  if(key=='t') {S.triangulate(E, F);}
+  if(key=='t') {S.roll_triangulate(E, F);}
   if(key=='u') {}
   if(key=='v') {}
   if(key=='w') {}
