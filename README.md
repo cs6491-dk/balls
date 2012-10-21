@@ -1,7 +1,7 @@
 3D Project
 ***
 
-High level requirements:
+## High level requirements
  * Need some device which creates spheres and shoots/drops them into the
    space
  * There is a surface (infinite plane to start)
@@ -10,7 +10,7 @@ High level requirements:
    sphere until it either hits the floor or contacts 2 (3?) other
 spheres at which points it stops
 
-Detailed Requirements:
+## Detailed Requirements:
  * ~~Write a 3D interactive sculpting program.~~
  * ~~Start with an initial set of small balls, maybe filling in a large ball.~~
  * ~~Write code that let’s the user point with the mouse and spray small balls around the designated surface point.~~
@@ -23,3 +23,6 @@ Detailed Requirements:
  * Add a key for exporting (saving to file) the balls and a key for exporting the triangle mesh in my .vts format (#vs, 3 vertex coordinates separated by ‘,’ for the vertices, one vertex per line, #ts, and 3 vertex indices separated by ‘,’ for the triangles, one triangle per line. Create and save 2 models: something that looks like a human face and something that has genus 2.
  * Make a short video showing your system in action where you add, rotate, delete balls to make an interesting shape (face, caricature…). Make sure that the video title page has the course number, project title, instructor’s name, your names and head shots.
 
+## References
+
+ * http://realtimecollisiondetection.net/blog/?p=103
