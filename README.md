@@ -25,4 +25,4 @@ spheres at which points it stops
 
 ## References
 
- * http://realtimecollisiondetection.net/blog/?p=103
+ * http://realtimecollisiondetection.net/blog/?p=103 (determine if sphere and triangle intersect)
