@@ -15,7 +15,7 @@ class RollSol {
 class Sculpture {
 
   ArrayList<Ball> Balls;
-  float r=20;
+  float r=10;
   Ball roller = null;
 
   Sculpture() {
@@ -138,7 +138,7 @@ class Sculpture {
     // add a large ball
     if (roller == null) {
       println("adding roller");
-      roller = new Ball(P(E), r*2);
+      roller = new Ball(P(E), r*1.5);
       Balls.add(roller);
     }
     else {

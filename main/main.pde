@@ -136,7 +136,7 @@ void keyPressed() {
   if(key=='b') {showBalls=!showBalls;}
   if(key=='c') {}
   if(key=='d') {E.z -= 100;} 
-  if(key=='e') {}
+  if(key=='e') {M.showEdges=!M.showEdges;}
   if(key=='f') {}
   if(key=='g') {}
   if(key=='h') {}
@@ -199,7 +199,7 @@ void keyPressed() {
   if(key==')') {showSilhouette=!showSilhouette;}
   if(key=='_') {M.flatShading=!M.flatShading;}
   if(key=='+') {M.flip();} // flip edge of M
-  if(key=='-') {M.showEdges=!M.showEdges;}
+  if(key=='-') {S.r--;}
   if(key=='=') {}
   if(key=='{') {}
   if(key=='}') {}
