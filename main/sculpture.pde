@@ -4,12 +4,11 @@ class Hit{
 	int min_Adx;
 }
 
-
 class Sculpture {
 	
 	ArrayList<Ball> Balls;
 	float r=20;
-
+        Ball B_sol, C_sol;
 
 	Sculpture() {
 		Balls = new ArrayList();
@@ -54,9 +53,9 @@ class Sculpture {
   pt rollBall(Ball A, Ball D, int Adx){
 
 		/* roll the new sphere into place */
-    Ball B, C;
     float a, min_a = TWO_PI;
     pt sol, min_sol = null;
+    Ball B,C;
     ArrayList<pt> sols;
     for (int Bdx=0; Bdx < Balls.size(); Bdx++) {
       if (Bdx != Adx) {
@@ -73,6 +72,8 @@ class Sculpture {
                   if (a < min_a) {
                     min_a = a;
                     min_sol = sol;
+                    B_sol = B;
+                    C_sol = C;
                   }
                 }
               }
@@ -81,8 +82,7 @@ class Sculpture {
         }
       }
     }
-      return min_sol;
-    
+      return min_sol;    
   }
 
   void triangulate(pt E, pt F){
@@ -114,21 +114,30 @@ class Sculpture {
     }
     roller.move(min_sol);
     Balls.add(roller);
-
-    // create the first triangle
     
+    // determine 
+
+    // create the first triangle A,B,C
     M.declareVectors();
-    M.nv = 5;
+    M.nv = 3;
+    println(A);
+/*    M.nv = 5;
     M.G[0].set(124.8207,1.777773,9.47427);
     M.G[1].set(193.10881,23.87775,10.50819);
     M.G[2].set(-57.601803,169.47241,-87.9093);
     M.G[3].set(-66.3798,120.499794,-105.5466);
     M.G[4].set(83.9652,39.7743,-5.67807);
-    M.nt = 3;
+    M.nt = 3;    */
+    println(A.toString());
+    M.G[0].set(A.c.x, A.c.y, A.c.z);
+    M.G[1].set(B_sol.c.x, B_sol.c.y, B_sol.c.z);
+    M.G[2].set(C_sol.c.x, C_sol.c.y, C_sol.c.z);
+    M.nt = 1;
     M.nc = 3*M.nt;
-    M.V[0] = int(2);
-    M.V[1] = int(4);
-    M.V[2] = int(3);
+    M.V[0] = 2;
+    M.V[1] = 1;
+    M.V[2] = 0;
+
 
     //M.loadMeshVTS("data/horse2.vts");
     M.resetMarkers().updateON();
@@ -163,3 +172,5 @@ class Sculpture {
 		Balls.add(D);
 	}
 }
+	
+	

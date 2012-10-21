@@ -53,6 +53,11 @@ vec R(vec V, float a, vec I, vec J) {float x=d(V,I), y=d(V,J); float c=cos(a), s
 class pt { float x=0,y=0,z=0; 
    pt () {}; 
    pt (float px, float py, float pz) {x = px; y = py; z = pz; };
+   String toString(){ 
+     //StringBuilder result = new StringBuilder();
+     //result.append("
+     return " x: " + x + " y: " + y + " z: " + z;
+   }
    pt set (float px, float py, float pz) {x = px; y = py; z = pz; return this;}; 
    pt set (pt P) {x = P.x; y = P.y; z = P.z; return this;}; 
    pt add(pt P) {x+=P.x; y+=P.y; z+=P.z; return this;};
