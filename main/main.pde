@@ -146,13 +146,13 @@ void keyPressed() {
   if(key=='k') {}
   if(key=='l') {}
   if(key=='m') {showMesh=!showMesh;}
-  if(key=='n') {S.naive_triangulate(E,F);}
+  if(key=='n') {S.naive_skin(E,F);}
   if(key=='o') {}
   if(key=='p') {}
-  if(key=='q') {}
+  if(key=='q') {S.manual_skin(E,F);}
   if(key=='r') {S.deleteBall(E, F);}
   if(key=='s') {S.addBall(E, F);}
-  if(key=='t') {S.roll_triangulate(E, F);}
+  if(key=='t') {S.roll_skin(E, F);}
   if(key=='u') {}
   if(key=='v') {}
   if(key=='w') {}

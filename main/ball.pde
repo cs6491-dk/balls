@@ -14,6 +14,9 @@ class Ball {
            popMatrix();
           
         }
+        Boolean has_vertex(){
+           if (vtx == -1) { return false;} else {return true;} 
+        }
 	void show() {
 		pushMatrix();
 		translate(c.x,c.y,c.z);
@@ -33,3 +36,5 @@ class Ball {
           return c.toString() + "vtx: " + vtx;
         }
 }
+
+

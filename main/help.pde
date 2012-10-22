@@ -4,6 +4,7 @@ void writeHelp () {fill(dblue);
     scribe("MESH L:load, .:pick corner, Y:subdivide, E:smoothen, W:write, N:next, S.swing ",i++);
     scribe("VIEW space:pick focus, [:reset, ;:on mouse, E:save, e:restore ",i++);
     scribe("SHOW ):silhouette, B:backfaces, |:normals, -:edges, c:curvature, g:Gouraud/flat, =:translucent",i++);
+    scribe("SKIN q: manual skin, n: naive skin, t: roll skin", i++);
     scribe("",i++);
 
    }

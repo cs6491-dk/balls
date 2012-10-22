@@ -99,7 +99,7 @@ class Sculpture {
     return min_sol;
   }
 
-  void naive_triangulate(pt E, pt F) {
+  void naive_skin(pt E, pt F) {
     float a, min_a = TWO_PI;
     pt min_sol = null;
     // loop over all triples...
@@ -136,7 +136,7 @@ class Sculpture {
         }
       }
     }
-    println("naive triangulation complete");
+    println("naive skin complete");
     }
 
 
@@ -170,7 +170,7 @@ class Sculpture {
     float sep = d(V(ta), N);
     return !(sep*sep > r*r);
   }
-  void roll_triangulate(pt E, pt F) {
+  void roll_skin(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
     // cluster of spheres
     int Adx, min_Adx = -1;
@@ -213,19 +213,90 @@ class Sculpture {
     B = Balls.get(min_sol.Bdx);
     C = Balls.get(min_sol.Cdx);
     
+    // add a triangle guaranteed to face the roller
+    addFacingTriangle(A, B, C, roller);        
+    
+    // add code here to traverse the rest of the point set, adding triangles as we go. 
+    // the idea is to rotate the sphere around one of the triangle edges until it hits another po
+    
+    // pick a ball closest to the existing triangle, which is not in the vertex list
+    int next_ball = -1;
+    float min_dist = 1e10;
+    for (int b=0; b < Balls.size(); b++){
+        if (Balls.get(b).has_vertex()) {continue;}
+        
+      
+    }        
+  }
+  void manual_skin(pt E, pt F) {
+    // triangulate by creating a large ball and rolling it around the
+    // cluster of spheres
+    int Adx, min_Adx = -1;
+    Ball A, B, C;
+    RollSol min_sol;
+
+    // add a large ball
+    if (roller == null) {
+      println("adding roller");
+      roller = new Ball(P(E), r*1.5);
+      Balls.add(roller);
+    }
+    else {
+      roller.move(P(E));
+    }
+    vec V = V(E, F);
+
+    // find the hit point 
+    Hit hit = findFirstHit(V, roller);
+    if (hit.min_A == null) {
+      println("Bad shot");
+      return;
+    }
+
+    // do the inital roll
+    roller.move(hit.min_t, V);
+    A = hit.min_A;
+    Adx = hit.min_Adx;
+    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
+    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
+    
+    if (min_sol == null) {
+      println("No kisses");
+      return;
+    }
+    roller.move(min_sol.sol);
+
+    // add a triangle A,B,C
+    // A is already defined as the first ball we hit with D, grab B and C
+    B = Balls.get(min_sol.Bdx);
+    C = Balls.get(min_sol.Cdx);
+    
+    // add a triangle guaranteed to face the roller
+    addFacingTriangle(A, B, C, roller);        
+    
+    // add code here to traverse the rest of the point set, adding triangles as we go. 
+    // the idea is to rotate the sphere around one of the triangle edges until it hits another point
+
+  }  
+  void addFacingTriangle(Ball A, Ball B, Ball C, Ball ref){
+    // add a triangle which faces a reference ball  
     // Check to see if A,B,C is facing the roller, if not, switch A and B 
     // first, get a unit the triangle normal
+    if (M.is_triangle(A.vtx, B.vtx, C.vtx)){
+      println("already have triangle");
+      return;
+    }    
     vec N = N(A.c, B.c, C.c);
     // dot with a vector from A to roller center;
-    float dir = d(N, V(A.c, roller.c));
+    float dir = d(N, V(A.c, ref.c));
     // If it is positive, we're in good shame, if not, need to reverse
+
     if (dir > 0){
       addTriangle(A, B, C);
     }
     else{
       addTriangle(B, A, C);       
-    }
-
+    }    
   }
   void addTriangle(Ball A, Ball B, Ball C){
     /*println("A: " + A.toString());
