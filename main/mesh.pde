@@ -832,7 +832,32 @@ Mesh loadMeshVTS(String fn) {
     return c;
     }  
     
-
+    boolean is_triangle(int v1, int v2, int v3) {
+      // given three vertices determine if we already have that triangle
+    
+      boolean retval = false;
+      // Use set class to compare triangles
+      Set<Integer> new_set = new HashSet<Integer>();
+      Set<Integer> comparison;
+      new_set.add(v1);
+      new_set.add(v2);
+      new_set.add(v3);
+      println("Compare " + v1 + "," + v2 + "," + v3);
+      for (int i=0; i < (nv); i+=3) {
+        println("(loop) Compare " + V[i] + "," + V[i+1] + "," + V[i+2]);
+        comparison = new HashSet<Integer>();
+        comparison.add((Integer)V[i]);
+        comparison.add((Integer)V[i+1]);
+        comparison.add((Integer)V[i+2]);
+        //if (v3 == 1) {println(comparison);}
+        if (new_set.equals(comparison)) {
+          println(v1 + "," + v2 + "," + v3 + " is already a triangle");
+          retval = true;
+          break;
+        }
+      }
+      return retval;
+    }
      
   } // ==== END OF MESH CLASS
   

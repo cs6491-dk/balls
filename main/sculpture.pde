@@ -15,7 +15,7 @@ class RollSol {
 class Sculpture {
 
   ArrayList<Ball> Balls;
-  float r=40;
+  float r=20;
   Ball roller = null;
 
   Sculpture() {
@@ -62,7 +62,7 @@ class Sculpture {
     } 
     return retval;
   }      
-  RollSol rollBall(Ball A, Ball D, int Adx) {
+  RollSol rollBall(Ball A, float dr, pt dc, int Adx) {
 
     /* roll the new sphere into place */
     float a, min_a = TWO_PI;
@@ -78,10 +78,10 @@ class Sculpture {
             if (Cdx != Adx) {
               C = Balls.get(Cdx);
               if ((abs(V(A.c, C.c).norm2() - sq(A.r+B.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
-                sols = sphere_pack(A, B, C, D.r);
+                sols = sphere_pack(A, B, C, dr);
                 for (int i=0; i < sols.size(); i++) {
                   sol = sols.get(i);
-                  a = angle(V(A.c, sol), V(A.c, D.c));
+                  a = angle(V(A.c, sol), V(A.c, dc));
                   if (a < min_a) {
                     min_a = a;
                     min_sol.sol = sol;
@@ -100,24 +100,44 @@ class Sculpture {
   }
 
   void naive_triangulate(pt E, pt F) {
-
+    float a, min_a = TWO_PI;
+    pt min_sol = null;
     // loop over all triples...
     for (int i=0; i < Balls.size(); i++) {
       for (int j=i+1; j < Balls.size(); j++) {
         for (int k=j+1; k < Balls.size(); k++) {
-          // define a triangle between balls i,j,k  
-          // if this triangle does not intersect any balls other than i,j,k, then add it.
-          if (!intersect_balls(i, j, k)) {
-            // add triangle
-            
-            addTriangle(Balls.get(i), Balls.get(j), Balls.get(k));
-            println("add triangle " + i + "," + j + "," + k);
-          }
+          Ball bi = Balls.get(i);
+          Ball bj = Balls.get(j);
+          Ball bk = Balls.get(k);
+          if (M.is_triangle(bi.vtx, bj.vtx, bk.vtx)){continue;}
+          // Define a sphere which touches the centers of the 3 balls
+          roller = new Ball(P(E), r*3);
+          ArrayList<pt> sols = sphere_pack(Balls.get(i), Balls.get(j), Balls.get(k), roller.r-Balls.get(i).r);
+          for (int idx=0; idx < sols.size(); idx++) {
+            pt sol = sols.get(idx);
+            a = angle(V(Balls.get(i).c, sol), V(Balls.get(i).c, roller.c));
+            if (a < min_a) {
+              min_a = a;
+              min_sol = sol;
+            }          
+          // if this sphere does not intersect other spheres, add it. 
+          Boolean res = false;
+          for (int b=0; b < Balls.size(); b++){
+            Ball test = Balls.get(b);
+              if (d(min_sol, test.c) < (roller.r + test.r)){
+                if (M.is_triangle(bi.vtx, bj.vtx, bk.vtx)){continue;}
+                 addTriangle(Balls.get(i), Balls.get(j), Balls.get(k));
+                 
+                 println("add triangle " + i + "," + j + "," + k);
+                 
+              } 
+            }              
+          }                               
         }
       }
     }
     println("naive triangulation complete");
-  }
+    }
 
 
   Boolean intersect_balls(int i, int j, int k) {
@@ -127,7 +147,7 @@ class Sculpture {
       // does this ball 
       Ball test = Balls.get(b);
       if ((b == i) | (b == j ) | (b == k)){
-        continue;
+          continue;
       }
       if (intersect_triangle_sphere(test.c, test.r, Balls.get(i).c, Balls.get(j).c, Balls.get(k).c)) {return true;}
     }
@@ -179,7 +199,9 @@ class Sculpture {
     roller.move(hit.min_t, V);
     A = hit.min_A;
     Adx = hit.min_Adx;
-    min_sol = rollBall(A, roller, Adx);
+    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
+    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
+    
     if (min_sol == null) {
       println("No kisses");
       return;
@@ -191,7 +213,18 @@ class Sculpture {
     B = Balls.get(min_sol.Bdx);
     C = Balls.get(min_sol.Cdx);
     
-    addTriangle(A, B, C);
+    // Check to see if A,B,C is facing the roller, if not, switch A and B 
+    // first, get a unit the triangle normal
+    vec N = N(A.c, B.c, C.c);
+    // dot with a vector from A to roller center;
+    float dir = d(N, V(A.c, roller.c));
+    // If it is positive, we're in good shame, if not, need to reverse
+    if (dir > 0){
+      addTriangle(A, B, C);
+    }
+    else{
+      addTriangle(B, A, C);       
+    }
 
   }
   void addTriangle(Ball A, Ball B, Ball C){
@@ -238,7 +271,7 @@ class Sculpture {
     A = hit.min_A;
     Adx = hit.min_Adx;
 
-    min_sol = rollBall(A, D, Adx);
+    min_sol = rollBall(A, D.r, D.c, Adx);
     if (min_sol.sol == null) {
       println("No kisses");
       return;

@@ -10,7 +10,7 @@ class Ball {
         void showPoint(){
            pushMatrix();
            translate(c.x, c.y, c.z);
-           sphere(1);
+           sphere(5);
            popMatrix();
           
         }
