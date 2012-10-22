@@ -28,3 +28,4 @@ spheres at which points it stops
 ## References
 
  * http://realtimecollisiondetection.net/blog/?p=103 (determine if sphere and triangle intersect)
+ * http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf (Ball rolling) 
