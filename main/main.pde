@@ -65,8 +65,9 @@ void draw() {
 
      // -------------------------------------------------------- show balls ---------------------------------
    if(showBalls) S.showBalls();
+   S.showBallCenters();
    fill(black);
-
+    
      // -------------------------------------------------------- show mesh ----------------------------------   
    if(showMesh) { fill(yellow); if(M.showEdges) stroke(red);  else noStroke(); M.showFront();} 
    
@@ -145,7 +146,7 @@ void keyPressed() {
   if(key=='k') {}
   if(key=='l') {}
   if(key=='m') {showMesh=!showMesh;}
-  if(key=='n') {}
+  if(key=='n') {S.naive_triangulate(E,F);}
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {}

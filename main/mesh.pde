@@ -448,9 +448,9 @@ void purge(int k) {for(int i=0; i<nt; i++) visible[i]=Mt[i]==k;} // hides triang
   void computeO() { // computes O for oriented non-manifold meshes
     for (int c=0; c<nc; c++) NME[c]=false; // assume initially that no edge is non-manifold
     int val[] = new int [nv]; for (int v=0; v<nv; v++) val[v]=0;  
-    println("*2*");
+    //println("*2*");
     for (int c=0; c<nc; c++) val[v(c)]++;   //  val[v] : vertex valence
-    println("*3*");
+    //println("*3*");
     int fic[] = new int [nv]; int rfic=0; for (int v=0; v<nv; v++) {fic[v]=rfic; rfic+=val[v];};  // fic[v] : head of list of incident corners
     for (int v=0; v<nv; v++) val[v]=0;   // reset valences to be reused to track how many incident corners were already encountered for each vertex
     int [] C = new int [nc]; // will be filed with corner IDs c, sorted by v(c): for each vertex, the list of its val[v] incident corners starts at C[fic[v]]

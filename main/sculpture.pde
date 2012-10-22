@@ -15,7 +15,7 @@ class RollSol {
 class Sculpture {
 
   ArrayList<Ball> Balls;
-  float r=10;
+  float r=40;
   Ball roller = null;
 
   Sculpture() {
@@ -25,7 +25,12 @@ class Sculpture {
     Balls.add(new Ball(new pt(  r, r*sqrt(3), 0), r));
     M.declareVectors();    
   }
-
+  void showBallCenters() {
+    for (int i=0; i < Balls.size(); i++) {
+      Balls.get(i).showPoint();
+    }
+  }
+  
   void showBalls() {
     for (int i=0; i < Balls.size(); i++) {
       Balls.get(i).show();
@@ -98,35 +103,52 @@ class Sculpture {
 
     // loop over all triples...
     for (int i=0; i < Balls.size(); i++) {
-      for (int j=0; j < Balls.size(); j++) {
-        for (int k=0; k < Balls.size(); j++) {
+      for (int j=i+1; j < Balls.size(); j++) {
+        for (int k=j+1; k < Balls.size(); k++) {
           // define a triangle between balls i,j,k  
           // if this triangle does not intersect any balls other than i,j,k, then add it.
           if (!intersect_balls(i, j, k)) {
             // add triangle
+            
+            addTriangle(Balls.get(i), Balls.get(j), Balls.get(k));
+            println("add triangle " + i + "," + j + "," + k);
           }
         }
       }
     }
+    println("naive triangulation complete");
   }
 
 
   Boolean intersect_balls(int i, int j, int k) {
     // see if a triangle formed by balls i,j,k intersects any other balls
-    Boolean does_intersect = true;
-
     // loop over all remaining balls and see if the triangle intersects
     for (int b=0; b < Balls.size(); b++) {
       // does this ball 
       Ball test = Balls.get(b);
-      //      if (intersect_triangle_sphere(test.pt.x, test.pt.y, test.pt.z,
+      if ((b == i) | (b == j ) | (b == k)){
+        continue;
+      }
+      if (intersect_triangle_sphere(test.c, test.r, Balls.get(i).c, Balls.get(j).c, Balls.get(k).c)) {return true;}
     }
-    return does_intersect;
-  }
-  Boolean intersect_triangle_sphere(float sx, float sy, float sz, float tx, float ty, float tz) {
-    // deter
-
     return false;
+  }
+  Boolean intersect_triangle_sphere(pt sc, float r, pt pa, pt pb, pt pc) {
+    // does a triangle defined by a,b,c interest a sphere with center sc and radius r?
+    // great reference here.. http://realtimecollisiondetection.net/blog/?p=103
+    
+    // For a simple test, we can look at a plane defined by the triangle and see if the sphere center 
+    // sc lies at least r away from the normal.  if this is true than it definitely does not intersect.
+    // There may be other cases where it also does not intersect, but maybe this is good enough to catch most
+    // of them.  worst case we don't add a triangle when we should, but we will never add one when we shouldn't.  :-)
+    
+    pt ta = P(pa).sub(sc);
+    pt tb = P(pb).sub(sc);
+    pt tc = P(pc).sub(sc);
+    // find a unit normal vector  by taking cross product of ab and ac and divide by magnitude
+    vec N = N(ta, tb, tc);
+    float sep = d(V(ta), N);
+    return !(sep*sep > r*r);
   }
   void roll_triangulate(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
@@ -169,12 +191,15 @@ class Sculpture {
     B = Balls.get(min_sol.Bdx);
     C = Balls.get(min_sol.Cdx);
     
-   
-    println("A: " + A.toString());
+    addTriangle(A, B, C);
+
+  }
+  void addTriangle(Ball A, Ball B, Ball C){
+    /*println("A: " + A.toString());
     println("B: " + B.toString());
-    println("C: " + C.toString());
+    println("C: " + C.toString());*/
     if (A.vtx == -1) {     
-      println("Setting A to vtx: " + M.nv);      
+      //println("Setting A to vtx: " + M.nv);      
       A.vtx = M.nv;
       M.G[M.nv++].set(A.c.x, A.c.y, A.c.z);
     }
@@ -186,26 +211,16 @@ class Sculpture {
       C.vtx = M.nv;
       M.G[M.nv++].set(C.c.x, C.c.y, C.c.z);
     }    
-    
-    println("Setting nt " + M.nt + "-" + (M.nt+2));
+    //println("Setting nt " + M.nt + "-" + (M.nt+2));
     M.V[M.nt*3] = A.vtx;
     M.V[M.nt*3+1] = B.vtx;
     M.V[M.nt*3+2] = C.vtx;
     M.nt += 1;
     M.nc = 3*M.nt;
-    println("G:");
-    for (int i=0; i < 3; i++) { 
-      println(M.G[i]);
-    }
-    println("V");
-    for (int i=0; i < 6; i++) { 
-      println(M.V[i]);
-    }    
-
     M.resetMarkers().updateON();
-    M.makeAllVisible();
+    M.makeAllVisible();    
+    
   }
-
   void addBall(pt E, pt F) {
     int Adx, min_Adx = -1;
     RollSol min_sol;
