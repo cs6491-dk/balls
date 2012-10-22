@@ -199,8 +199,8 @@ class Sculpture {
     roller.move(hit.min_t, V);
     A = hit.min_A;
     Adx = hit.min_Adx;
-    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
-    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
+    //min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
+    min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
     
     if (min_sol == null) {
       println("No kisses");
@@ -217,16 +217,42 @@ class Sculpture {
     addFacingTriangle(A, B, C, roller);        
     
     // add code here to traverse the rest of the point set, adding triangles as we go. 
-    // the idea is to rotate the sphere around one of the triangle edges until it hits another po
+    // the idea is to rotate the sphere around one of the triangle edges until it hits another point.
+    // but we won't actually compute that rotation...
     
     // pick a ball closest to the existing triangle, which is not in the vertex list
-    int next_ball = -1;
-    float min_dist = 1e10;
-    for (int b=0; b < Balls.size(); b++){
-        if (Balls.get(b).has_vertex()) {continue;}
+    for (int f=0; f < 1; f++){
+      println("trying to add more triangles");
+      Ball next_ball = null;
+      int next_idx = 0;
+      float min_dist = 1e10;
+      float testval = 0;
+      for (int b=0; b < Balls.size(); b++){
+          Ball test = Balls.get(b);
+          // Check to see if ball is spoken for... 
+          // Better to check if the triangle exists as we can't complete the surface this way
+          if (test.has_vertex()) {continue;} 
+          if (test == roller) { continue;}
+          testval = d(test.c, P(A.c,B.c));
+          if (testval < min_dist){
+             next_ball = Balls.get(b);
+             next_idx = b;
+             min_dist = testval;                
+          }
         
+      }
+      println("next ball: " + next_ball);
+      // move roller to a point R above the next ball and call rollBall
       
-    }        
+      roller.move(P(next_ball.c, roller.r, U(N(A.c, B.c, next_ball.c))));
+      min_sol = rollBall(A, roller.r, roller.c, next_idx);  // roll to edges
+      roller.move(min_sol.sol);
+      B = Balls.get(min_sol.Bdx);
+      C = Balls.get(min_sol.Cdx);
+      addFacingTriangle(A, B, next_ball, roller);  
+      C = next_ball;
+    }
+       
   }
   void manual_skin(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
@@ -289,7 +315,7 @@ class Sculpture {
     vec N = N(A.c, B.c, C.c);
     // dot with a vector from A to roller center;
     float dir = d(N, V(A.c, ref.c));
-    // If it is positive, we're in good shame, if not, need to reverse
+    // If it is positive, we're in good shape, if not,  switch A/B
 
     if (dir > 0){
       addTriangle(A, B, C);
@@ -299,11 +325,7 @@ class Sculpture {
     }    
   }
   void addTriangle(Ball A, Ball B, Ball C){
-    /*println("A: " + A.toString());
-    println("B: " + B.toString());
-    println("C: " + C.toString());*/
-    if (A.vtx == -1) {     
-      //println("Setting A to vtx: " + M.nv);      
+    if (A.vtx == -1) {           
       A.vtx = M.nv;
       M.G[M.nv++].set(A.c.x, A.c.y, A.c.z);
     }
@@ -315,7 +337,6 @@ class Sculpture {
       C.vtx = M.nv;
       M.G[M.nv++].set(C.c.x, C.c.y, C.c.z);
     }    
-    //println("Setting nt " + M.nt + "-" + (M.nt+2));
     M.V[M.nt*3] = A.vtx;
     M.V[M.nt*3+1] = B.vtx;
     M.V[M.nt*3+2] = C.vtx;
