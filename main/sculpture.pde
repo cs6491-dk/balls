@@ -1,6 +1,5 @@
 class Hit {
   float min_t;
-  Ball min_A;
   int min_Adx;
 }
 
@@ -25,6 +24,7 @@ class Sculpture {
     Balls.add(new Ball(new pt(  r, r*sqrt(3), 0), r));
     M.declareVectors();    
   }
+
   void showBallCenters() {
     for (int i=0; i < Balls.size(); i++) {
       Balls.get(i).showPoint();
@@ -44,11 +44,13 @@ class Sculpture {
     println("delete " + hit.min_Adx);    
     Balls.remove(hit.min_Adx);
   }
+
   Hit findFirstHit(vec V, Ball D) {
     Ball A;
     float t=1e10;
     Hit retval = new Hit();
     retval.min_t = 1e10;
+    retval.min_Adx = -1;
 
     /* find the first ball hit */
     for (int i=0; i < Balls.size(); i++) {
@@ -56,14 +58,14 @@ class Sculpture {
       t = sphere_collision_time(A, V, D);
       if ((0 < t) && (t < retval.min_t)) {
         retval.min_t = t;
-        retval.min_A = A;
         retval.min_Adx = i;
       }
     } 
     return retval;
-  }      
-  RollSol rollBall(Ball A, float dr, pt dc, int Adx) {
-    // A 
+  }
+
+  RollSol rollBall(int Adx, float dr, pt dc) {
+    Ball A = Balls.get(Adx);
 
     /* roll the new sphere into place */
     float a, min_a = TWO_PI;
@@ -78,7 +80,7 @@ class Sculpture {
           for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
             if (Cdx != Adx) {
               C = Balls.get(Cdx);
-              if ((abs(V(A.c, C.c).norm2() - sq(A.r+B.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
+              if ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
                 sols = sphere_pack(A, B, C, dr);
                 for (int i=0; i < sols.size(); i++) {
                   sol = sols.get(i);
@@ -98,6 +100,51 @@ class Sculpture {
       }
     }
     return min_sol;
+  }
+
+  int rollBall2(int Adx, int Bdx, Ball D) {
+	Ball A = Balls.get(Adx),
+	     B = Balls.get(Bdx);
+    float min_th = TWO_PI;
+    int min_th_Cdx = -1;
+    pt min_th_sol = null;
+    Ball C;
+    for (int Cdx=0; Cdx < Balls.size(); Cdx++) {
+      if ((Cdx == Adx) || (Cdx == Bdx)) { continue;}
+
+      C = Balls.get(Cdx);
+      // Make sure it won't roll through
+      if (d(A.c, C.c) > 2*D.r) {continue;}
+      if (d(B.c, C.c) > 2*D.r) {continue;}
+      // K is a point on AB which the "end" of the projection of AD onto AB.  
+      // 1. compute K (A + (dot(AD,U(A,B)))U(A,B) where UAB=AB/||AB||
+      vec AD = V(A.c, D.c);
+      vec UAB = U(A.c,B.c);
+      pt K = P(A.c, d(AD,UAB), UAB);
+
+      ArrayList<pt> sols = sphere_pack2(A, B, C, D.r, d(A.c, B.c), d(A.c, C.c), d(B.c, C.c));
+
+      for (int sdx=0; sdx < sols.size(); sdx++) {
+        pt DP = sols.get(sdx);
+        float th = acos(d(V(K,D.c), V(K, DP))/(d(K, D.c)*d(K,DP)));
+        if (d(N(V(K,D.c), V(K, DP)), V(K, A.c)) > 0){
+          th = TWO_PI-th;
+        }
+        if (abs(th) < 1e-3){
+          continue;
+        }
+        if (th < min_th){
+          min_th = th;
+          min_th_sol = DP;
+          min_th_Cdx = Cdx;
+        }
+      }
+    }
+    println("theta " + min_th);
+    println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
+    D.move(min_th_sol);
+    println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
+    return min_th_Cdx;
   }
 
   void naive_skin(pt E, pt F) {
@@ -140,7 +187,6 @@ class Sculpture {
     println("naive skin complete");
     }
 
-
   Boolean intersect_balls(int i, int j, int k) {
     // see if a triangle formed by balls i,j,k intersects any other balls
     // loop over all remaining balls and see if the triangle intersects
@@ -154,6 +200,7 @@ class Sculpture {
     }
     return false;
   }
+
   Boolean intersect_triangle_sphere(pt sc, float r, pt pa, pt pb, pt pc) {
     // does a triangle defined by a,b,c interest a sphere with center sc and radius r?
     // great reference here.. http://realtimecollisiondetection.net/blog/?p=103
@@ -171,111 +218,66 @@ class Sculpture {
     float sep = d(V(ta), N);
     return !(sep*sep > r*r);
   }
+
   void roll_skin(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
     // cluster of spheres
-    int Adx, min_Adx = -1;
+    int Adx, Bdx, Cdx, min_Adx = -1;
     Ball A, B, C;
     RollSol min_sol;
     float min_th=1e10;
     RollSol min_th_sol = null;
 
     // add a large ball
-    roller = new Ball(P(E), r*1.2);
-    //Balls.add(roller);
+    Ball D = new Ball(P(E), r*1.2);
+    //Balls.add(D);
 
     // define the vector we are looking through
     vec V = V(E, F);
 
     // find the hit point 
-    Hit hit = findFirstHit(V, roller);
-    if (hit.min_A == null) {
+    Hit hit = findFirstHit(V, D);
+    if (hit.min_Adx == -1) {
       println("Bad shot");
       return;
     }
 
     // do the inital roll
-    roller.move(hit.min_t, V);
-    A = hit.min_A;
+    D.move(hit.min_t, V);
     Adx = hit.min_Adx;
-    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
-    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
+    A = Balls.get(Adx);
+    min_sol = rollBall(Adx, D.r-A.r, D.c);  // roll to points - not always correct
+    //min_sol = rollBall(A, D.r, D.c, Adx); // roll to sphere edges
     
     if (min_sol == null) {
       println("No kisses");
       return;
     }
     // actually move it there
-    roller.move(min_sol.sol);
+    D.move(min_sol.sol);
 
     // add a triangle A,B,C
     // A is already defined as the first ball we hit with D, grab B and C
-    B = Balls.get(min_sol.Bdx);
-    C = Balls.get(min_sol.Cdx);
-    
+    Bdx = min_sol.Bdx;
+    Cdx = min_sol.Cdx;
+    B = Balls.get(Bdx);
+    C = Balls.get(Cdx);
+
     // add a triangle guaranteed to face the roller
-    if (addFacingTriangle(A, B, C, roller)) {
-      Ball tmp = B;
-      B = C;
-      C = tmp;
-    }
-    
+    addFacingTriangle(A, B, C, D);
+
     // add code here to traverse the rest of the point set, adding triangles as we go. 
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point.
     // but we won't actually compute that rotation...
-    
+
     // pick a ball closest to the existing triangle, which is not in the vertex list
-    for (int f=0; f < 40; f++){
+    for (int f=0; f < 5; f++){
       println("trying to add more triangles");
-      for (int b=0; b < Balls.size(); b++){
-    
-          Ball test = Balls.get(b); //E
-          // Check to see if ball is spoken for... 
-          // Better to check if the triangle exists as we can't complete the surface this way
-          //if (test.has_vertex()) {continue;} 
-          if ((test == roller) || (test == A) || (test == B) || (test == C)) { continue;}
-          
-          // Make sure it won't roll through
-          if (d(A.c, test.c) > 2*roller.r) {continue;}
-          if (d(B.c, test.c) > 2*roller.r) {continue;}
-          println("got here1");
-          // K is a point on AB which the "end" of the projection of AD onto AB.  
-          // 1. compute K (A + (dot(AD,U(A,B)))U(A,B) where UAB=AB/||AB||
-          vec AD = V(A.c, roller.c);
-          vec UAB = U(A.c,B.c);
-          pt K = P(A.c, d(AD,UAB), UAB); 
-          println("got here1.5");
-          min_sol = rollBall(test, roller.r, roller.c, b);
-          println("got here 1.6");
-          
-          println("got here 1.7");
-          // 2. Compute D' using modified roll.. prevent fall-through
-          // by checking ||AE|| <=2r and ||BE|| <= 2r where E is new vertex         
-          float th = acos(d(V(K,roller.c), V(K, min_sol.sol))/(d(K, roller.c)*d(K,min_sol.sol)));
-          if (d(N(V(K,roller.c), V(K, min_sol.sol)), V(K, A.c)) < 0){
-            th = 2*PI-th;
-          }
-          
-          println("got here2");
-          if (th == 0){
-            continue;
-          }
-          if (th < min_th){
-            min_th = th;
-            min_th_sol = min_sol;            
-          }
-          println("theta " + th);
-        
-      }
-      if (min_th_sol == null)
-      {}
-      else
-      {
-        roller.move(min_th_sol.sol);
-        A = Balls.get(min_sol.Adx);
-        B = Balls.get(min_sol.Bdx);
-        C = Balls.get(min_sol.Cdx);
-        addFacingTriangle(A, B, C, roller);          
+      Cdx = rollBall2(Adx, Bdx, D);
+      if (Cdx != -1) {
+        C = Balls.get(Cdx);
+        println("C.vtx = " + C.vtx);
+        addFacingTriangle(A, B, C, D);
       }
       
     }
@@ -301,18 +303,18 @@ class Sculpture {
 
     // find the hit point 
     Hit hit = findFirstHit(V, roller);
-    if (hit.min_A == null) {
+    if (hit.min_Adx == -1) {
       println("Bad shot");
       return;
     }
 
     // do the inital roll
     roller.move(hit.min_t, V);
-    A = hit.min_A;
     Adx = hit.min_Adx;
-    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
-    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
-    
+    A = Balls.get(Adx);
+    min_sol = rollBall(Adx, roller.r-A.r, roller.c);  // roll to points
+    //min_sol = rollBall(Adx, roller.r, roller.c); // roll to sphere edges
+
     if (min_sol == null) {
       println("No kisses");
       return;
@@ -337,7 +339,7 @@ class Sculpture {
     // first, get a unit the triangle normal
     if (M.is_triangle(A.vtx, B.vtx, C.vtx)){
       println("already have triangle");
-      return;
+      return false;
     }    
     vec N = N(A.c, B.c, C.c);
     // dot with a vector from A to roller center;
@@ -346,11 +348,11 @@ class Sculpture {
 
     if (dir > 0){
       addTriangle(A, B, C);
-      return False;
+      return false;
     }
     else{
       addTriangle(B, A, C);       
-      return True;
+      return true;
     }    
   }
   void addTriangle(Ball A, Ball B, Ball C){
@@ -384,15 +386,14 @@ class Sculpture {
 
     Hit hit = findFirstHit(V, D);
 
-    if (hit.min_A == null) {
+    if (hit.min_Adx == -1) {
       println("Bad shot");
       return;
     }
     D.move(hit.min_t, V);
-    A = hit.min_A;
     Adx = hit.min_Adx;
 
-    min_sol = rollBall(A, D.r, D.c, Adx);
+    min_sol = rollBall(Adx, D.r, D.c);
     if (min_sol.sol == null) {
       println("No kisses");
       return;
@@ -401,5 +402,3 @@ class Sculpture {
     Balls.add(D);
   }
 }
-
-
