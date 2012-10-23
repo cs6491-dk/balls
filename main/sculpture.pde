@@ -251,7 +251,7 @@ class Sculpture {
           if (d(N(V(K,roller.c), V(K, min_sol.sol)), V(K, A.c)) < 0){
             th = 2*PI-th;
           }
-          roller.move(min_th_sol.sol);
+          
           println("got here2");
           if (th == 0){
             continue;
@@ -267,6 +267,7 @@ class Sculpture {
       {}
       else
       {
+        roller.move(min_th_sol.sol);
         A = Balls.get(min_sol.Adx);
         B = Balls.get(min_sol.Bdx);
         C = Balls.get(min_sol.Cdx);
