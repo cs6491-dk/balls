@@ -181,14 +181,10 @@ class Sculpture {
     RollSol min_th_sol = null;
 
     // add a large ball
-    if (roller == null) {
-      println("adding roller");
-      roller = new Ball(P(E), r*1.1);
-      Balls.add(roller);
-    }
-    else {
-      roller.move(P(E));
-    }
+    roller = new Ball(P(E), r*1.2);
+    //Balls.add(roller);
+
+    // define the vector we are looking through
     vec V = V(E, F);
 
     // find the hit point 
@@ -202,13 +198,14 @@ class Sculpture {
     roller.move(hit.min_t, V);
     A = hit.min_A;
     Adx = hit.min_Adx;
-    //min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
-    min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
+    min_sol = rollBall(A, roller.r-A.r, roller.c, Adx);  // roll to points
+    //min_sol = rollBall(A, roller.r, roller.c, Adx); // roll to sphere edges
     
     if (min_sol == null) {
       println("No kisses");
       return;
     }
+    // actually move it there
     roller.move(min_sol.sol);
 
     // add a triangle A,B,C
@@ -224,30 +221,38 @@ class Sculpture {
     // but we won't actually compute that rotation...
     
     // pick a ball closest to the existing triangle, which is not in the vertex list
-    for (int f=0; f < 7; f++){
+    for (int f=0; f < 40; f++){
       println("trying to add more triangles");
-      Ball next_ball = null;
-      int next_idx = 0;
       for (int b=0; b < Balls.size(); b++){
     
           Ball test = Balls.get(b); //E
           // Check to see if ball is spoken for... 
           // Better to check if the triangle exists as we can't complete the surface this way
-          if (test.has_vertex()) {continue;} 
+          //if (test.has_vertex()) {continue;} 
           if (test == roller) { continue;}
           
-          // K is a point on AB which is projection of AD onto AB.  
+          // Make sure it won't roll through
+          if (d(A.c, test.c) < 2*roller.r) {continue;}
+          if (d(B.c, test.c) < 2*roller.r) {continue;}
+          println("got here1");
+          // K is a point on AB which the "end" of the projection of AD onto AB.  
           // 1. compute K (A + (dot(AD,U(A,B)))U(A,B) where UAB=AB/||AB||
           vec AD = V(A.c, roller.c);
           vec UAB = U(A.c,B.c);
           pt K = P(A.c, d(AD,UAB), UAB); 
+          println("got here1.5");
           min_sol = rollBall(test, roller.r, roller.c, b);
+          println("got here 1.6");
+          
+          println("got here 1.7");
           // 2. Compute D' using modified roll.. prevent fall-through
           // by checking ||AE|| <=2r and ||BE|| <= 2r where E is new vertex         
           float th = acos(d(V(K,roller.c), V(K, min_sol.sol))/(d(K, roller.c)*d(K,min_sol.sol)));
           if (d(N(V(K,roller.c), V(K, min_sol.sol)), V(K, A.c)) < 0){
             th = 2*PI-th;
           }
+          roller.move(min_th_sol.sol);
+          println("got here2");
           if (th == 0){
             continue;
           }
@@ -262,23 +267,12 @@ class Sculpture {
       {}
       else
       {
-        roller.move(min_th_sol.sol);
-        //addFacingTriangle(A, B, 
         A = Balls.get(min_sol.Adx);
         B = Balls.get(min_sol.Bdx);
         C = Balls.get(min_sol.Cdx);
         addFacingTriangle(A, B, C, roller);          
       }
-      println("min_th: " + min_th);
-      // move roller to a point R above the next ball and call rollBall
       
-      /*roller.move(P(next_ball.c, roller.r, U(N(A.c, B.c, next_ball.c))));
-      min_sol = rollBall(A, roller.r, roller.c, next_idx);  // roll to edges
-      roller.move(min_sol.sol);
-      B = Balls.get(min_sol.Bdx);
-      C = Balls.get(min_sol.Cdx);
-      addFacingTriangle(A, B, next_ball, roller);  
-      C = next_ball;*/
     }
        
   }
