@@ -63,6 +63,7 @@ class Sculpture {
     return retval;
   }      
   RollSol rollBall(Ball A, float dr, pt dc, int Adx) {
+    // A 
 
     /* roll the new sphere into place */
     float a, min_a = TWO_PI;
@@ -176,11 +177,13 @@ class Sculpture {
     int Adx, min_Adx = -1;
     Ball A, B, C;
     RollSol min_sol;
+    float min_th=1e10;
+    RollSol min_th_sol = null;
 
     // add a large ball
     if (roller == null) {
       println("adding roller");
-      roller = new Ball(P(E), r*1.5);
+      roller = new Ball(P(E), r*1.1);
       Balls.add(roller);
     }
     else {
@@ -221,36 +224,61 @@ class Sculpture {
     // but we won't actually compute that rotation...
     
     // pick a ball closest to the existing triangle, which is not in the vertex list
-    for (int f=0; f < 1; f++){
+    for (int f=0; f < 7; f++){
       println("trying to add more triangles");
       Ball next_ball = null;
       int next_idx = 0;
-      float min_dist = 1e10;
-      float testval = 0;
       for (int b=0; b < Balls.size(); b++){
-          Ball test = Balls.get(b);
+    
+          Ball test = Balls.get(b); //E
           // Check to see if ball is spoken for... 
           // Better to check if the triangle exists as we can't complete the surface this way
           if (test.has_vertex()) {continue;} 
           if (test == roller) { continue;}
-          testval = d(test.c, P(A.c,B.c));
-          if (testval < min_dist){
-             next_ball = Balls.get(b);
-             next_idx = b;
-             min_dist = testval;                
+          
+          // K is a point on AB which is projection of AD onto AB.  
+          // 1. compute K (A + (dot(AD,U(A,B)))U(A,B) where UAB=AB/||AB||
+          vec AD = V(A.c, roller.c);
+          vec UAB = U(A.c,B.c);
+          pt K = P(A.c, d(AD,UAB), UAB); 
+          min_sol = rollBall(test, roller.r, roller.c, b);
+          // 2. Compute D' using modified roll.. prevent fall-through
+          // by checking ||AE|| <=2r and ||BE|| <= 2r where E is new vertex         
+          float th = acos(d(V(K,roller.c), V(K, min_sol.sol))/(d(K, roller.c)*d(K,min_sol.sol)));
+          if (d(N(V(K,roller.c), V(K, min_sol.sol)), V(K, A.c)) < 0){
+            th = 2*PI-th;
           }
+          if (th == 0){
+            continue;
+          }
+          if (th < min_th){
+            min_th = th;
+            min_th_sol = min_sol;            
+          }
+          println("theta " + th);
         
       }
-      println("next ball: " + next_ball);
+      if (min_th_sol == null)
+      {}
+      else
+      {
+        roller.move(min_th_sol.sol);
+        //addFacingTriangle(A, B, 
+        A = Balls.get(min_sol.Adx);
+        B = Balls.get(min_sol.Bdx);
+        C = Balls.get(min_sol.Cdx);
+        addFacingTriangle(A, B, C, roller);          
+      }
+      println("min_th: " + min_th);
       // move roller to a point R above the next ball and call rollBall
       
-      roller.move(P(next_ball.c, roller.r, U(N(A.c, B.c, next_ball.c))));
+      /*roller.move(P(next_ball.c, roller.r, U(N(A.c, B.c, next_ball.c))));
       min_sol = rollBall(A, roller.r, roller.c, next_idx);  // roll to edges
       roller.move(min_sol.sol);
       B = Balls.get(min_sol.Bdx);
       C = Balls.get(min_sol.Cdx);
       addFacingTriangle(A, B, next_ball, roller);  
-      C = next_ball;
+      C = next_ball;*/
     }
        
   }
