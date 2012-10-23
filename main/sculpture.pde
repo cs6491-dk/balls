@@ -214,7 +214,11 @@ class Sculpture {
     C = Balls.get(min_sol.Cdx);
     
     // add a triangle guaranteed to face the roller
-    addFacingTriangle(A, B, C, roller);        
+    if (addFacingTriangle(A, B, C, roller)) {
+      Ball tmp = B;
+      B = C;
+      C = tmp;
+    }
     
     // add code here to traverse the rest of the point set, adding triangles as we go. 
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point.
@@ -229,11 +233,11 @@ class Sculpture {
           // Check to see if ball is spoken for... 
           // Better to check if the triangle exists as we can't complete the surface this way
           //if (test.has_vertex()) {continue;} 
-          if (test == roller) { continue;}
+          if ((test == roller) || (test == A) || (test == B) || (test == C)) { continue;}
           
           // Make sure it won't roll through
-          if (d(A.c, test.c) < 2*roller.r) {continue;}
-          if (d(B.c, test.c) < 2*roller.r) {continue;}
+          if (d(A.c, test.c) > 2*roller.r) {continue;}
+          if (d(B.c, test.c) > 2*roller.r) {continue;}
           println("got here1");
           // K is a point on AB which the "end" of the projection of AD onto AB.  
           // 1. compute K (A + (dot(AD,U(A,B)))U(A,B) where UAB=AB/||AB||
@@ -327,7 +331,7 @@ class Sculpture {
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point
 
   }  
-  void addFacingTriangle(Ball A, Ball B, Ball C, Ball ref){
+  boolean addFacingTriangle(Ball A, Ball B, Ball C, Ball ref){
     // add a triangle which faces a reference ball  
     // Check to see if A,B,C is facing the roller, if not, switch A and B 
     // first, get a unit the triangle normal
@@ -342,9 +346,11 @@ class Sculpture {
 
     if (dir > 0){
       addTriangle(A, B, C);
+      return False;
     }
     else{
       addTriangle(B, A, C);       
+      return True;
     }    
   }
   void addTriangle(Ball A, Ball B, Ball C){
