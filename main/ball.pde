@@ -14,6 +14,7 @@ class Ball {
 		translate(c.x, c.y, c.z);
 		sphere(1);
 		popMatrix();
+                text(Gdx, c.x+1, c.y+1, c.z+1);
 	}
 
 	void show() {
@@ -22,6 +23,7 @@ class Ball {
 		sphere(r);
                 
 		popMatrix();
+                text(Gdx, c.x+1, c.y+1, c.z+1);
 	}
 
 	void move(pt C) {
