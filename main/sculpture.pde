@@ -64,7 +64,7 @@ class Sculpture {
     return retval;
   }
 
-  RollSol rollBall(int Adx, float dr, pt dc) {
+  RollSol rollBall(int Adx, float dr, pt dc, boolean require_kissed, boolean roll_on_points) {
     Ball A = Balls.get(Adx);
 
     /* roll the new sphere into place */
@@ -76,23 +76,21 @@ class Sculpture {
     for (int Bdx=0; Bdx < Balls.size(); Bdx++) {
       if (Bdx != Adx) {
         B = Balls.get(Bdx);
-        if (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) < 1e-3) {
-          for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
-            if (Cdx != Adx) {
-              C = Balls.get(Cdx);
-              if ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) < 1e-3) && (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) < 1e-3)) {
-                sols = sphere_pack(A, B, C, dr);
-                for (int i=0; i < sols.size(); i++) {
-                  sol = sols.get(i);
-                  a = angle(V(A.c, sol), V(A.c, dc));
-                  if (a < min_a) {
-                    min_a = a;
-                    min_sol.sol = sol;
-                    min_sol.Adx = Adx;
-                    min_sol.Bdx = Bdx;
-                    min_sol.Cdx = Cdx;
-                  }
-                }
+        if (require_kissed && (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) > 1e-3)) continue;
+        for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
+          if (Cdx != Adx) {
+            C = Balls.get(Cdx);
+            if (require_kissed && ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) > 1e-3) || (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) > 1e-3))) continue;
+            sols = sphere_pack(A, B, C, dr, roll_on_points);
+            for (int i=0; i < sols.size(); i++) {
+              sol = sols.get(i);
+              a = angle(V(A.c, sol), V(A.c, dc));
+              if (a < min_a) {
+                min_a = a;
+                min_sol.sol = sol;
+                min_sol.Adx = Adx;
+                min_sol.Bdx = Bdx;
+                min_sol.Cdx = Cdx;
               }
             }
           }
@@ -122,7 +120,7 @@ class Sculpture {
       vec UAB = U(A.c,B.c);
       pt K = P(A.c, d(AD,UAB), UAB);
 
-      ArrayList<pt> sols = sphere_pack2(A, B, C, D.r, d(A.c, B.c), d(A.c, C.c), d(B.c, C.c));
+      ArrayList<pt> sols = sphere_pack(A, B, C, D.r, true); //roll_on_points
 
       for (int sdx=0; sdx < sols.size(); sdx++) {
         pt DP = sols.get(sdx);
@@ -193,7 +191,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*2);
+    Ball D = new Ball(P(E), r*2.5);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -210,7 +208,7 @@ class Sculpture {
     D.move(hit.min_t, V);
     Adx = hit.min_Adx;
     A = Balls.get(Adx);
-    min_sol = rollBall(Adx, D.r-A.r, D.c);  // roll to points - not always correct
+    min_sol = rollBall(Adx, D.r, D.c, false, true);  // don't require kissed, roll on points
     //min_sol = rollBall(A, D.r, D.c, Adx); // roll to sphere edges
     
     if (min_sol == null) {
@@ -292,7 +290,7 @@ class Sculpture {
     roller.move(hit.min_t, V);
     Adx = hit.min_Adx;
     A = Balls.get(Adx);
-    min_sol = rollBall(Adx, roller.r-A.r, roller.c);  // roll to points
+    min_sol = rollBall(Adx, roller.r, roller.c, false, true);  // don't require kissed, roll to points
     //min_sol = rollBall(Adx, roller.r, roller.c); // roll to sphere edges
 
     if (min_sol == null) {
@@ -379,7 +377,7 @@ class Sculpture {
     D.move(hit.min_t, V);
     Adx = hit.min_Adx;
 
-    min_sol = rollBall(Adx, D.r, D.c);
+    min_sol = rollBall(Adx, D.r, D.c, true, false); //require kissed, don't roll on points
     if (min_sol.sol == null) {
       println("No kisses");
       return;

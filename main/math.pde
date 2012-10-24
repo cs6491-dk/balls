@@ -25,7 +25,7 @@ pt rot_angle_axis(pt P, float angle, vec axis) {
 	return ret;
 }
 
-ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
+ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr, boolean points) {
 	/* We solve for the solution of the axis-aligned tetrahedron,
 	 * then apply that solution to the real tetrahedron.
 	 * This may well be faster, and avoids more complicated algorithms,
@@ -34,14 +34,23 @@ ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr) {
 	 * C is in the z=0 plane */
 
 	/* Solve for projection of 4th vertex onto plane of first 3 */
-	float len_AB = A.r + B.r,
-	      len_AC = A.r + C.r,
-	      len_BC = B.r + C.r,
-	      len_AD = A.r + Dr;
+	float len_AB = d(A.c, B.c),
+	      len_AC = d(A.c, C.c),
+	      len_BC = d(B.c, C.c),
+	      len_AD = Dr,
+	      len_BD = Dr,
+	      len_CD = Dr;
+    if (!points) {
+		len_AD += A.r;
+		len_BD += B.r;
+		len_CD += C.r;
+	}
 	float cos_CAB = (sq(len_AB)+sq(len_AC)-sq(len_BC))/2/len_AB/len_AC;
-	float M_AB_x = cos_CAB*len_AC;
+	float cos_DAC = (sq(len_AC)+sq(len_AD)-sq(len_CD))/2/len_AC/len_AD;
+	float cos_DAB = (sq(len_AB)+sq(len_AD)-sq(len_BD))/2/len_AB/len_AD;
+	float M_AB_x = cos_DAB*len_AD;
 
-	float len_M_AC = cos_CAB*len_AB;
+	float len_M_AC = cos_DAC*len_AD;
 	float M_AC_x = cos_CAB*len_M_AC;
 	float M_AC_y = sqrt(sq(len_M_AC)-sq(M_AC_x));
 	float V_AC_x = -M_AC_y,
