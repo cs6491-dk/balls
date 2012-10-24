@@ -835,30 +835,25 @@ Mesh loadMeshVTS(String fn) {
     
     boolean is_triangle(int v1, int v2, int v3) {
       // given three vertices determine if we already have that triangle
-      if (nt == 0){
-         return false; 
-      }
+      if (nt == 0){ return false;}
+      if (v1 == -1 | v2 == -1 | v3 == -1) {return false;}
       boolean retval = false;      
-      // Use set class to compare triangles
-      Set<Integer> new_set = new HashSet<Integer>();
-      Set<Integer> comparison;
-      new_set.add(v1);
-      new_set.add(v2);
-      new_set.add(v3);
       println("Compare " + v1 + "," + v2 + "," + v3);
       for (int i=0; i < nt; i++) {
-        println("(loop) Compare " + V[i] + "," + V[i+1] + "," + V[i+2]);
-        comparison = new HashSet<Integer>();
-        comparison.add((Integer)V[i]);
-        comparison.add((Integer)V[i+1]);
-        comparison.add((Integer)V[i+2]);
-        //if (v3 == 1) {println(comparison);}
-        if (new_set.equals(comparison)) {
-          println(v1 + "," + v2 + "," + v3 + " is already a triangle");
-          retval = true;
-          break;
-        }
+        //println("i, nt " + i + "," + nt);
+        //println("(loop) Compare " + V[3*i] + "," + V[3*i+1] + "," + V[3*i+2]);
+        int Vi, Vi1, Vi2;
+        Vi = V[3*i];
+        Vi1 = V[3*i+1];
+        Vi2 = V[3*i+2];
+        if (v1 == Vi   && v2 == Vi1  && v3 == Vi2) {retval = true; break;} // 0 1 2
+        if (v1 == Vi   && v2 == Vi2  && v3 == Vi1) {retval = true; break;} // 0 2 1
+        if (v1 == Vi1  && v2 == Vi   && v3 == Vi2) {retval = true; break;} //  1 0 2
+        if (v1 == Vi1  && v2 == Vi2  && v3 == Vi) {retval = true; break;} // 1 2 0
+        if (v1 == Vi2  && v2 == Vi1  && v3 == Vi) {retval = true; break;} // 2 1 0
+        if (v1 == Vi2  && v2 == Vi  && v3 == Vi1) {retval = true; break;} // 2 0 1
       }
+      println("(is_triangle) retval: " + retval);
       return retval;
     }
      
