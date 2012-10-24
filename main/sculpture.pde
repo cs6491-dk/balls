@@ -97,7 +97,21 @@ class Sculpture {
             for (int i=0; i < sols.size(); i++) {
               sol = sols.get(i);
               a = angle(V(A.c, sol), V(A.c, dc));
-              if (a < min_a) {
+
+              boolean collision = false;
+              Ball test;
+              for (int jdx = 0; jdx < Balls.size(); jdx++) {
+                if ((jdx == Adx) || (jdx == Bdx) || (jdx == Cdx)) continue;
+                test = Balls.get(jdx);
+                float threshold = dr;
+                if (!roll_on_points) threshold += test.r;
+                if (abs(d(Balls.get(jdx).c, sol) - threshold) < 1e-3) {
+                  collision = true;
+                  break;
+                }
+              }
+
+              if ((a < min_a) && !collision) {
                 min_a = a;
                 min_sol.sol = sol;
                 min_sol.Adx = Adx;
@@ -143,7 +157,20 @@ class Sculpture {
         if (abs(th) < 1e-3){
           continue;
         }
-        if (th < min_th){
+
+        boolean collision = false;
+        Ball test;
+        for (int jdx = 0; jdx < Balls.size(); jdx++) {
+          if ((jdx == Adx) || (jdx == Bdx) || (jdx == Cdx)) continue;
+          test = Balls.get(jdx);
+          float threshold = D.r;
+          if (abs(d(Balls.get(jdx).c, DP) - threshold) < 1e-3) {
+            collision = true;
+            break;
+          }
+        }
+
+        if ((th < min_th) && !collision){
           min_th = th;
           min_th_sol = DP;
           min_th_Cdx = Cdx;
