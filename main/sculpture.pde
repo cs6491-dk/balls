@@ -147,45 +147,6 @@ class Sculpture {
     return min_th_Cdx;
   }
 
-  void naive_skin(pt E, pt F) {
-    float a, min_a = TWO_PI;
-    pt min_sol = null;
-    // loop over all triples...
-    for (int i=0; i < Balls.size(); i++) {
-      for (int j=i+1; j < Balls.size(); j++) {
-        for (int k=j+1; k < Balls.size(); k++) {
-          Ball bi = Balls.get(i);
-          Ball bj = Balls.get(j);
-          Ball bk = Balls.get(k);
-          if (M.is_triangle(bi.vtx, bj.vtx, bk.vtx)){continue;}
-          // Define a sphere which touches the centers of the 3 balls
-          roller = new Ball(P(E), r*3);
-          ArrayList<pt> sols = sphere_pack(Balls.get(i), Balls.get(j), Balls.get(k), roller.r-Balls.get(i).r);
-          for (int idx=0; idx < sols.size(); idx++) {
-            pt sol = sols.get(idx);
-            a = angle(V(Balls.get(i).c, sol), V(Balls.get(i).c, roller.c));
-            if (a < min_a) {
-              min_a = a;
-              min_sol = sol;
-            }          
-          // if this sphere does not intersect other spheres, add it. 
-          Boolean res = false;
-          for (int b=0; b < Balls.size(); b++){
-            Ball test = Balls.get(b);
-              if (d(min_sol, test.c) < (roller.r + test.r)){
-                if (M.is_triangle(bi.vtx, bj.vtx, bk.vtx)){continue;}
-                 addTriangle(Balls.get(i), Balls.get(j), Balls.get(k));
-                 
-                 println("add triangle " + i + "," + j + "," + k);
-                 
-              } 
-            }              
-          }                               
-        }
-      }
-    }
-    println("naive skin complete");
-    }
 
   Boolean intersect_balls(int i, int j, int k) {
     // see if a triangle formed by balls i,j,k intersects any other balls
@@ -229,7 +190,7 @@ class Sculpture {
     RollSol min_th_sol = null;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*1.2);
+    Ball D = new Ball(P(E), r*1.5);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -264,24 +225,25 @@ class Sculpture {
     C = Balls.get(Cdx);
 
     // add a triangle guaranteed to face the roller
-    addFacingTriangle(A, B, C, D);
+    addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
 
     // add code here to traverse the rest of the point set, adding triangles as we go. 
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point.
     // but we won't actually compute that rotation...
 
     // pick a ball closest to the existing triangle, which is not in the vertex list
-    for (int f=0; f < 5; f++){
+    for (int f=0; f < 3; f++){
       println("trying to add more triangles");
       Cdx = rollBall2(Adx, Bdx, D);
       if (Cdx != -1) {
         C = Balls.get(Cdx);
         println("C.vtx = " + C.vtx);
-        addFacingTriangle(A, B, C, D);
+        addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
       }
       
     }
-       
+    M.updateON();
+    M.makeAllVisible();    
   }
   void manual_skin(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
@@ -323,21 +285,24 @@ class Sculpture {
 
     // add a triangle A,B,C
     // A is already defined as the first ball we hit with D, grab B and C
+    A = Balls.get(min_sol.Adx);
     B = Balls.get(min_sol.Bdx);
     C = Balls.get(min_sol.Cdx);
     
     // add a triangle guaranteed to face the roller
-    addFacingTriangle(A, B, C, roller);        
+    addFacingTriangle(A, B, C, Adx, min_sol.Bdx, min_sol.Cdx, roller);        
     
     // add code here to traverse the rest of the point set, adding triangles as we go. 
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point
+    M.resetMarkers().updateON();
+    M.makeAllVisible();  
 
   }  
-  boolean addFacingTriangle(Ball A, Ball B, Ball C, Ball ref){
+  boolean addFacingTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx, Ball ref){
     // add a triangle which faces a reference ball  
     // Check to see if A,B,C is facing the roller, if not, switch A and B 
     // first, get a unit the triangle normal
-    if (M.is_triangle(A.vtx, B.vtx, C.vtx)){
+    if (M.is_triangle(Adx, Bdx, Cdx)){
       println("already have triangle");
       return false;
     }    
@@ -347,34 +312,30 @@ class Sculpture {
     // If it is positive, we're in good shape, if not,  switch A/B
 
     if (dir > 0){
-      addTriangle(A, B, C);
+      addTriangle(A, B, C, Adx, Bdx, Cdx);
       return false;
     }
     else{
-      addTriangle(B, A, C);       
+      addTriangle(B, A, C, Bdx, Adx, Cdx);       
       return true;
     }    
   }
-  void addTriangle(Ball A, Ball B, Ball C){
-    if (A.vtx == -1) {           
-      A.vtx = M.nv;
-      M.G[M.nv++].set(A.c.x, A.c.y, A.c.z);
-    }
-    if (B.vtx == -1) {
-      B.vtx = M.nv;
-      M.G[M.nv++].set(B.c.x, B.c.y, B.c.z);
-    }
-    if (C.vtx == -1) {
-      C.vtx = M.nv;
-      M.G[M.nv++].set(C.c.x, C.c.y, C.c.z);
-    }    
-    M.V[M.nt*3] = A.vtx;
-    M.V[M.nt*3+1] = B.vtx;
-    M.V[M.nt*3+2] = C.vtx;
+  void addTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx){
+
+    M.G[Adx].set(A.c.x, A.c.y, A.c.z);
+    M.G[Bdx].set(B.c.x, B.c.y, B.c.z);
+    M.G[Cdx].set(C.c.x, C.c.y, C.c.z);     
+    M.nv += 3;
+    M.V[M.nt*3] = Adx;
+    M.V[M.nt*3+1] = Bdx;
+    M.V[M.nt*3+2] = Cdx;
     M.nt += 1;
+    println(M.G[M.V[0]] + " " + M.G[M.V[1]] + " " + M.G[M.V[2]]);
+    println(M.V[0] + " " + M.V[1] + " " + M.V[2]);
+
+    
     M.nc = 3*M.nt;
-    M.resetMarkers().updateON();
-    M.makeAllVisible();    
+  
     
   }
   void addBall(pt E, pt F) {

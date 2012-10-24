@@ -146,7 +146,7 @@ void keyPressed() {
   if(key=='k') {}
   if(key=='l') {}
   if(key=='m') {showMesh=!showMesh;}
-  if(key=='n') {S.naive_skin(E,F);}
+  if(key=='n') {}
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {S.manual_skin(E,F);}
