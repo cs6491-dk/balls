@@ -193,7 +193,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*2);
+    Ball D = new Ball(P(E), r*1.5);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -228,8 +228,8 @@ class Sculpture {
     C = Balls.get(Cdx);
 
     // add a triangle guaranteed to face the roller
-    addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
-	if (d(N(V(A.c,B.c), V(A.c,C.c)), V(A.c,D.c)) > 0) {
+    addFacingTriangle(A, B, C, D);
+	if (d(N(A.c,B.c,C.c), V(A.c, D.c)) > 0) {
       // Counter-clockwise triangle
       recursive_roll(A, B, Adx, Bdx, D.copy());
       recursive_roll(B, C, Bdx, Cdx, D.copy());
@@ -249,15 +249,12 @@ class Sculpture {
   void recursive_roll(Ball A, Ball B, int Adx, int Bdx, Ball D){
     boolean added;
     Ball C;
-    println("trying to add more triangles");
     int Cdx = rollBall2(Adx, Bdx, D);
     if (Cdx != -1) {
       C = Balls.get(Cdx);
-      added = addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
+      added = addFacingTriangle(A, B, C, D);
       if (!added) {return;}
-      println("recursing left");
       recursive_roll(A,C, Adx, Cdx, D);
-      println("recursing right");
       recursive_roll(C,B, Cdx, Bdx, D);
     }
     else
@@ -311,7 +308,7 @@ class Sculpture {
     C = Balls.get(min_sol.Cdx);
     
     // add a triangle guaranteed to face the roller
-    addFacingTriangle(A, B, C, Adx, min_sol.Bdx, min_sol.Cdx, roller);        
+    addFacingTriangle(A, B, C, roller);        
     
     // add code here to traverse the rest of the point set, adding triangles as we go. 
     // the idea is to rotate the sphere around one of the triangle edges until it hits another point
@@ -320,44 +317,45 @@ class Sculpture {
 
   }
 
-  boolean addFacingTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx, Ball ref){
+  boolean addFacingTriangle(Ball A, Ball B, Ball C, Ball ref){
     // add a triangle which faces a reference ball  
     // Check to see if A,B,C is facing the roller, if not, switch A and B 
     // first, get a unit the triangle normal
-    println("testing: (" + Adx + "," + Bdx + "," + Cdx + ")");
-    if (M.is_triangle(Adx, Bdx, Cdx)){
-      println("already have triangle");
-      return false;
-    }
     vec N = N(A.c, B.c, C.c);
     // dot with a vector from A to roller center;
     float dir = d(N, V(A.c, ref.c));
     // If it is positive, we're in good shape, if not,  switch A/B
-
+    
+    println("testing: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
     if (dir > 0){
-      addTriangle(A, B, C, Adx, Bdx, Cdx);
-      println("Added as is");
+      if (M.is_triangle(A.Gdx, B.Gdx, C.Gdx)){
+        println("already have triangle");
+        return false;
+      }    
+      else {println("no triangle found: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");}
+      addTriangle(A, B, C);
+      println("added: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
     }
     else{
-      addTriangle(B, A, C, Bdx, Adx, Cdx);       
-      println("Added backwards");
+      if (M.is_triangle(B.Gdx, A.Gdx, C.Gdx)){
+        println("already have triangle");
+        return false;
+      }        
+      addTriangle(B, A, C);       
+      println("added: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
     }
     return true;
   }
 
-  void addTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx){
+  void addTriangle(Ball A, Ball B, Ball C){
 
-    M.G[Adx].set(A.c.x, A.c.y, A.c.z);
-    M.G[Bdx].set(B.c.x, B.c.y, B.c.z);
-    M.G[Cdx].set(C.c.x, C.c.y, C.c.z);     
-    M.nv += 3;
-    M.V[M.nt*3] = Adx;
-    M.V[M.nt*3+1] = Bdx;
-    M.V[M.nt*3+2] = Cdx;
-    M.nt += 1;
-    //println(M.G[M.V[0]] + " " + M.G[M.V[1]] + " " + M.G[M.V[2]]);
-    //println(M.V[0] + " " + M.V[1] + " " + M.V[2]);
-    
+    if (A.Gdx == -1){ A.Gdx = M.nv; M.G[M.nv++].set(A.c.x, A.c.y, A.c.z); }
+    if (B.Gdx == -1){ B.Gdx = M.nv; M.G[M.nv++].set(B.c.x, B.c.y, B.c.z); }
+    if (C.Gdx == -1){ C.Gdx = M.nv; M.G[M.nv++].set(C.c.x, C.c.y, C.c.z); }
+    M.V[M.nt*3] = A.Gdx;
+    M.V[M.nt*3+1] = B.Gdx;
+    M.V[M.nt*3+2] = C.Gdx;
+    M.nt += 1;    
     M.nc = 3*M.nt;
   }
 

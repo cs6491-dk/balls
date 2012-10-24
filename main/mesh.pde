@@ -835,7 +835,7 @@ Mesh loadMeshVTS(String fn) {
     
     boolean is_triangle(int v1, int v2, int v3) {
       // given three vertices determine if we already have that triangle
-      if (nv == 0){
+      if (nt == 0){
          return false; 
       }
       boolean retval = false;      
@@ -846,7 +846,7 @@ Mesh loadMeshVTS(String fn) {
       new_set.add(v2);
       new_set.add(v3);
       //println("Compare " + v1 + "," + v2 + "," + v3);
-      for (int i=0; i < (nv); i+=3) {
+      for (int i=0; i < nt; i++) {
         //println("(loop) Compare " + V[i] + "," + V[i+1] + "," + V[i+2]);
         comparison = new HashSet<Integer>();
         comparison.add((Integer)V[i]);

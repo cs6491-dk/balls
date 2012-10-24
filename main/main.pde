@@ -150,7 +150,7 @@ void keyPressed() {
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {S.manual_skin(E,F);}
-  if(key=='r') {S.deleteBall(E, F);}
+  if(key=='r') {S.deleteBall(E, F);M.resetCounters();S.roll_skin(E,F);}
   if(key=='s') {S.addBall(E, F);}
   if(key=='t') {S.roll_skin(E, F);}
   if(key=='u') {}

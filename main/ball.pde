@@ -1,10 +1,12 @@
 class Ball {
 	pt c;
 	float r;
+        int Gdx; // ties to an entry in G
 
 	Ball(pt arg_c, float arg_r) {
 		c = arg_c;
 		r = arg_r;
+                Gdx = -1;
 	}
 
 	void showPoint(){
