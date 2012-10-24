@@ -845,16 +845,16 @@ Mesh loadMeshVTS(String fn) {
       new_set.add(v1);
       new_set.add(v2);
       new_set.add(v3);
-      //println("Compare " + v1 + "," + v2 + "," + v3);
+      println("Compare " + v1 + "," + v2 + "," + v3);
       for (int i=0; i < nt; i++) {
-        //println("(loop) Compare " + V[i] + "," + V[i+1] + "," + V[i+2]);
+        println("(loop) Compare " + V[i] + "," + V[i+1] + "," + V[i+2]);
         comparison = new HashSet<Integer>();
         comparison.add((Integer)V[i]);
         comparison.add((Integer)V[i+1]);
         comparison.add((Integer)V[i+2]);
         //if (v3 == 1) {println(comparison);}
         if (new_set.equals(comparison)) {
-          //println(v1 + "," + v2 + "," + v3 + " is already a triangle");
+          println(v1 + "," + v2 + "," + v3 + " is already a triangle");
           retval = true;
           break;
         }

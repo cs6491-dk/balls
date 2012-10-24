@@ -193,7 +193,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*1.5);
+    Ball D = new Ball(P(E), r*2);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -326,8 +326,9 @@ class Sculpture {
     float dir = d(N, V(A.c, ref.c));
     // If it is positive, we're in good shape, if not,  switch A/B
     
-    println("testing: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
+    
     if (dir > 0){
+      println("testing: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
       if (M.is_triangle(A.Gdx, B.Gdx, C.Gdx)){
         println("already have triangle");
         return false;
@@ -335,14 +336,17 @@ class Sculpture {
       else {println("no triangle found: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");}
       addTriangle(A, B, C);
       println("added: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
+      println("nt: " + M.nt);
     }
     else{
+      println("testing: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
       if (M.is_triangle(B.Gdx, A.Gdx, C.Gdx)){
         println("already have triangle");
         return false;
       }        
       addTriangle(B, A, C);       
       println("added: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
+       println("nt: " + M.nt);
     }
     return true;
   }
