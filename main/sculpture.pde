@@ -35,6 +35,9 @@ class Sculpture {
     for (int i=0; i < Balls.size(); i++) {
       Balls.get(i).show();
     }
+    if (roller != null) {
+      roller.show();
+    }
   }
   void deleteBall(pt E, pt F) {
     Ball D = new Ball(P(E), r);
@@ -76,11 +79,21 @@ class Sculpture {
     for (int Bdx=0; Bdx < Balls.size(); Bdx++) {
       if (Bdx != Adx) {
         B = Balls.get(Bdx);
-        if (require_kissed && (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) > 1e-3)) continue;
+
+        if (require_kissed) {
+          if (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) > 1e-3) continue;
+        }
+        else if (d(A.c, B.c) > 2*dr) continue;
+
         for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
           if (Cdx != Adx) {
             C = Balls.get(Cdx);
-            if (require_kissed && ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) > 1e-3) || (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) > 1e-3))) continue;
+
+            if (require_kissed) {
+              if ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) > 1e-3) || (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) > 1e-3)) continue;
+            }
+            else if ((d(A.c, C.c) > 2*dr) || (d(B.c, C.c) > 2*dr)) continue;
+
             sols = sphere_pack(A, B, C, dr, roll_on_points);
             for (int i=0; i < sols.size(); i++) {
               sol = sols.get(i);
@@ -272,7 +285,7 @@ class Sculpture {
     if (roller == null) {
       println("adding roller");
       roller = new Ball(P(E), r*1.5);
-      Balls.add(roller);
+      //Balls.add(roller);
     }
     else {
       roller.move(P(E));
