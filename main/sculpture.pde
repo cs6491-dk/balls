@@ -227,24 +227,33 @@ class Sculpture {
     // add a triangle guaranteed to face the roller
     addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
 
-    // add code here to traverse the rest of the point set, adding triangles as we go. 
-    // the idea is to rotate the sphere around one of the triangle edges until it hits another point.
-    // but we won't actually compute that rotation...
+    recursive_roll(A, B, Adx, Bdx, Cdx, D);
+    
 
-    // pick a ball closest to the existing triangle, which is not in the vertex list
-    for (int f=0; f < 3; f++){
-      println("trying to add more triangles");
-      Cdx = rollBall2(Adx, Bdx, D);
-      if (Cdx != -1) {
-        C = Balls.get(Cdx);
-        println("C.vtx = " + C.vtx);
-        addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
-      }
-      
-    }
-    M.updateON();
+    M.resetMarkers().updateON();
     M.makeAllVisible();    
   }
+  
+  void recursive_roll(Ball A, Ball B, int Adx, int Bdx, int Cdx, Ball D){
+    boolean added;
+    Ball C;
+    println("trying to add more triangles");
+    Cdx = rollBall2(Adx, Bdx, D);
+    if (Cdx != -1) {
+      C = Balls.get(Cdx);
+      added = addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
+      if (!added) {return;}
+      println("recursing left");
+      recursive_roll(A,C, Adx, Cdx, Bdx, D);
+      println("recursing right");
+      recursive_roll(B,C, Bdx, Cdx, Adx, D);
+    }
+    else
+    {
+       return; 
+    }    
+  }
+  
   void manual_skin(pt E, pt F) {
     // triangulate by creating a large ball and rolling it around the
     // cluster of spheres
