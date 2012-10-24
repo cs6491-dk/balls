@@ -41,7 +41,7 @@ class Sculpture {
     vec V = V(E, F);
 
     Hit hit = findFirstHit(V, D);      
-    println("delete " + hit.min_Adx);    
+    //println("delete " + hit.min_Adx);    
     Balls.remove(hit.min_Adx);
   }
 
@@ -140,11 +140,16 @@ class Sculpture {
         }
       }
     }
-    println("theta " + min_th);
-    println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
-    D.move(min_th_sol);
-    println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
-    return min_th_Cdx;
+    //println("theta " + min_th);
+    //println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
+    if (min_th_sol == null) {
+      return -1;
+    }
+    else {
+      D.move(min_th_sol);
+      //println("D.c = (" + D.c.x + "," + D.c.y + "," + D.c.z + ")");
+      return min_th_Cdx;
+    }
   }
 
 
@@ -186,11 +191,9 @@ class Sculpture {
     int Adx, Bdx, Cdx, min_Adx = -1;
     Ball A, B, C;
     RollSol min_sol;
-    float min_th=1e10;
-    RollSol min_th_sol = null;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*1.5);
+    Ball D = new Ball(P(E), r*2);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -226,27 +229,36 @@ class Sculpture {
 
     // add a triangle guaranteed to face the roller
     addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
-
-    recursive_roll(A, B, Adx, Bdx, Cdx, D);
-    
+	if (d(N(V(A.c,B.c), V(A.c,C.c)), V(A.c,D.c)) > 0) {
+      // Counter-clockwise triangle
+      recursive_roll(A, B, Adx, Bdx, D.copy());
+      recursive_roll(B, C, Bdx, Cdx, D.copy());
+      recursive_roll(C, A, Cdx, Adx, D.copy());
+    }
+    else {
+      // Clockwise triangle
+      recursive_roll(B, A, Bdx, Adx, D.copy());
+      recursive_roll(C, B, Cdx, Bdx, D.copy());
+      recursive_roll(A, C, Adx, Cdx, D.copy());
+    }
 
     M.resetMarkers().updateON();
     M.makeAllVisible();    
   }
   
-  void recursive_roll(Ball A, Ball B, int Adx, int Bdx, int Cdx, Ball D){
+  void recursive_roll(Ball A, Ball B, int Adx, int Bdx, Ball D){
     boolean added;
     Ball C;
     println("trying to add more triangles");
-    Cdx = rollBall2(Adx, Bdx, D);
+    int Cdx = rollBall2(Adx, Bdx, D);
     if (Cdx != -1) {
       C = Balls.get(Cdx);
       added = addFacingTriangle(A, B, C, Adx, Bdx, Cdx, D);
       if (!added) {return;}
       println("recursing left");
-      recursive_roll(A,C, Adx, Cdx, Bdx, D);
+      recursive_roll(A,C, Adx, Cdx, D);
       println("recursing right");
-      recursive_roll(B,C, Bdx, Cdx, Adx, D);
+      recursive_roll(C,B, Cdx, Bdx, D);
     }
     else
     {
@@ -306,15 +318,17 @@ class Sculpture {
     M.resetMarkers().updateON();
     M.makeAllVisible();  
 
-  }  
+  }
+
   boolean addFacingTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx, Ball ref){
     // add a triangle which faces a reference ball  
     // Check to see if A,B,C is facing the roller, if not, switch A and B 
     // first, get a unit the triangle normal
+    println("testing: (" + Adx + "," + Bdx + "," + Cdx + ")");
     if (M.is_triangle(Adx, Bdx, Cdx)){
       println("already have triangle");
       return false;
-    }    
+    }
     vec N = N(A.c, B.c, C.c);
     // dot with a vector from A to roller center;
     float dir = d(N, V(A.c, ref.c));
@@ -322,13 +336,15 @@ class Sculpture {
 
     if (dir > 0){
       addTriangle(A, B, C, Adx, Bdx, Cdx);
-      return false;
+      println("Added as is");
     }
     else{
       addTriangle(B, A, C, Bdx, Adx, Cdx);       
-      return true;
-    }    
+      println("Added backwards");
+    }
+    return true;
   }
+
   void addTriangle(Ball A, Ball B, Ball C, int Adx, int Bdx, int Cdx){
 
     M.G[Adx].set(A.c.x, A.c.y, A.c.z);
@@ -339,14 +355,12 @@ class Sculpture {
     M.V[M.nt*3+1] = Bdx;
     M.V[M.nt*3+2] = Cdx;
     M.nt += 1;
-    println(M.G[M.V[0]] + " " + M.G[M.V[1]] + " " + M.G[M.V[2]]);
-    println(M.V[0] + " " + M.V[1] + " " + M.V[2]);
-
+    //println(M.G[M.V[0]] + " " + M.G[M.V[1]] + " " + M.G[M.V[2]]);
+    //println(M.V[0] + " " + M.V[1] + " " + M.V[2]);
     
     M.nc = 3*M.nt;
-  
-    
   }
+
   void addBall(pt E, pt F) {
     int Adx, min_Adx = -1;
     RollSol min_sol;

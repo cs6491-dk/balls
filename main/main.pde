@@ -14,7 +14,7 @@ Boolean
   showBalls=true,
   showMesh=false,
   translucent=false,   
-  showSilhouette=true, 
+  showSilhouette=false, 
   showHelpText=false; 
 
 // ****************************** VIEW PARAMETERS *******************************************************
