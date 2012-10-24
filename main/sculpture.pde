@@ -138,7 +138,7 @@ class Sculpture {
       for (int sdx=0; sdx < sols.size(); sdx++) {
         pt DP = sols.get(sdx);
         float th = acos(d(V(K,D.c), V(K, DP))/(d(K, D.c)*d(K,DP)));
-        if (d(N(V(K,D.c), V(K, DP)), V(K, A.c)) > 0){
+        if (d(N(V(K,D.c), V(K, DP)), V(K, A.c)) < 0){
           th = TWO_PI-th;
         }
         if (abs(th) < 1e-3){
@@ -204,7 +204,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*2.5);
+    Ball D = new Ball(P(E), r*5);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -240,14 +240,16 @@ class Sculpture {
 
     // add a triangle guaranteed to face the roller
     addFacingTriangle(A, B, C, D);
-	if (d(N(A.c,B.c,C.c), V(A.c, D.c)) > 0) {
+	if (d(N(A.c,B.c,C.c), V(A.c, D.c)) < 0) {
       // Counter-clockwise triangle
+      println("CCW");
       recursive_roll(A, B, Adx, Bdx, D.copy());
       recursive_roll(B, C, Bdx, Cdx, D.copy());
       recursive_roll(C, A, Cdx, Adx, D.copy());
     }
     else {
       // Clockwise triangle
+      println("CW");
       recursive_roll(B, A, Bdx, Adx, D.copy());
       recursive_roll(C, B, Cdx, Bdx, D.copy());
       recursive_roll(A, C, Adx, Cdx, D.copy());
@@ -265,8 +267,8 @@ class Sculpture {
       C = Balls.get(Cdx);
       added = addFacingTriangle(A, B, C, D);
       if (!added) {return;}
-      recursive_roll(A,C, Adx, Cdx, D);
-      recursive_roll(C,B, Cdx, Bdx, D);
+      recursive_roll(A,C, Adx, Cdx, D.copy());
+      recursive_roll(C,B, Cdx, Bdx, D.copy());
     }
     else
     {
@@ -397,5 +399,9 @@ class Sculpture {
     }
     D.move(min_sol.sol);
     Balls.add(D);
+
+    A = Balls.get(0);
+    Ball B = Balls.get(1), C = Balls.get(2);
+	//println(d(N(A.c,B.c,C.c), V(A.c, D.c)));
   }
 }

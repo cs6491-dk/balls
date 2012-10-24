@@ -25,7 +25,7 @@ pt rot_angle_axis(pt P, float angle, vec axis) {
 	return ret;
 }
 
-ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr, boolean points) {
+ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr, boolean pack_on_points) {
 	/* We solve for the solution of the axis-aligned tetrahedron,
 	 * then apply that solution to the real tetrahedron.
 	 * This may well be faster, and avoids more complicated algorithms,
@@ -40,7 +40,7 @@ ArrayList<pt> sphere_pack(Ball A, Ball B, Ball C, float Dr, boolean points) {
 	      len_AD = Dr,
 	      len_BD = Dr,
 	      len_CD = Dr;
-    if (!points) {
+    if (!pack_on_points) {
 		len_AD += A.r;
 		len_BD += B.r;
 		len_CD += C.r;
