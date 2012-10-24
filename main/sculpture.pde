@@ -22,7 +22,6 @@ class Sculpture {
     Balls.add(new Ball(new pt(  0, 0, 0), r));
     Balls.add(new Ball(new pt(2*r, 0, 0), r));
     Balls.add(new Ball(new pt(  r, r*sqrt(3), 0), r));
-    M.declareVectors();    
   }
 
   void showBallCenters() {
@@ -197,6 +196,10 @@ class Sculpture {
   }
 
   void roll_skin(pt E, pt F) {
+    M = new Mesh();
+    for (int idx=0; idx < Balls.size(); idx++) {
+       Balls.get(idx).Gdx = -1;
+    }
     // triangulate by creating a large ball and rolling it around the
     // cluster of spheres
     int Adx, Bdx, Cdx, min_Adx = -1;
@@ -204,7 +207,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*5);
+    Ball D = new Ball(P(E), r*1.5);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -403,5 +406,7 @@ class Sculpture {
     A = Balls.get(0);
     Ball B = Balls.get(1), C = Balls.get(2);
 	//println(d(N(A.c,B.c,C.c), V(A.c, D.c)));
+
+    roll_skin(E, F);
   }
 }

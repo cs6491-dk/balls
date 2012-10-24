@@ -28,7 +28,6 @@ class Mesh {
  // rendering modes
  Boolean flatShading=false, showEdges=false, showCurvature=false;  // showEdges shoes edges as gaps. Smooth shading works only when !showEdge
 
-
  // primary tables
  pt[] G = new pt [maxnv];                   // geometry table (vertices)
  int[] V = new int [3*maxnt];               // V table (triangle/vertex indices)
@@ -134,7 +133,7 @@ vec[] Nt = new vec [maxnt];                // triangles normals
    
    
 //  ==================================== INIT, CREATE, COPY ====================================
- Mesh() {}
+ Mesh() { declareVectors();}
 
  Mesh declareVectors() {
    for (int i=0; i<maxnv; i++) {G[i]=P(); Nv[i]=V();};   // init vertices and normals
