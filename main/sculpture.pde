@@ -279,14 +279,14 @@ class Sculpture {
     addFacingTriangle(A, B, C, D);
 	if (d(N(A.c,B.c,C.c), V(A.c, D.c)) < 0) {
       // Counter-clockwise triangle
-      println("CCW");
+      //println("CCW");
       recursive_roll(A, B, Adx, Bdx, D.copy());
       recursive_roll(B, C, Bdx, Cdx, D.copy());
       recursive_roll(C, A, Cdx, Adx, D.copy());
     }
     else {
       // Clockwise triangle
-      println("CW");
+      //println("CW");
       recursive_roll(B, A, Bdx, Adx, D.copy());
       recursive_roll(C, B, Cdx, Bdx, D.copy());
       recursive_roll(A, C, Adx, Cdx, D.copy());
@@ -378,25 +378,25 @@ class Sculpture {
     
     
     if (dir > 0){
-      println("testing: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
+      //println("testing: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
       if (M.is_triangle(A.Gdx, B.Gdx, C.Gdx)){
-        println("already have triangle");
+        //println("already have triangle");
         return false;
       }    
-      else {println("no triangle found: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");}
+      else {}//println("no triangle found: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");}
       addTriangle(A, B, C);
-      println("added: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
-      println("nt: " + M.nt);
+      //println("added: (" + A.Gdx + "," + B.Gdx + "," + C.Gdx + ")");
+      //println("nt: " + M.nt);
     }
     else{
-      println("testing: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
+      //println("testing: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
       if (M.is_triangle(B.Gdx, A.Gdx, C.Gdx)){
-        println("already have triangle");
+        //println("already have triangle");
         return false;
       }        
       addTriangle(B, A, C);       
-      println("added: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
-       println("nt: " + M.nt);
+      //println("added: (" + B.Gdx + "," + A.Gdx + "," + C.Gdx + ")");
+       //println("nt: " + M.nt);
     }
     return true;
   }

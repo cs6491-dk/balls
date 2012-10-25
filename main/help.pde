@@ -1,16 +1,21 @@
 void writeHelp () {fill(dblue);
     int i=0;
-    scribe("3D VIEWER 2012 (Jarek Rossignac)",i++);
+    scribe("Mesh Drawing Demo (Donnie Smith, Kyle Harrigan).. based on 3D VIEWER 2012 (Jarek Rossignac)",i++);
     scribe("MESH L:load, .:pick corner, Y:subdivide, E:smoothen, W:write, N:next, S.swing ",i++);
     scribe("VIEW space:pick focus, [:reset, ;:on mouse, E:save, e:restore ",i++);
     scribe("SHOW ):silhouette, B:backfaces, |:normals, -:edges, c:curvature, g:Gouraud/flat, =:translucent",i++);
     scribe("SKIN q: manual skin, n: naive skin, t: roll skin", i++);
+    scribe("BALL s: add ball", i++);
+    scribe("BRUSH +: increase brush radius, -: decrease brush radius",i++);
     scribe("",i++);
 
    }
 void writeFooterHelp () {fill(dbrown);
-    scribeFooter("Jarek Rossignac's 3D template.  Press ?:help",1);
+    scribeFooter("Donnie Smith / Kyle Harrigan 3D mesh drawing program.  Press ?:help",1);
   }
+void writeHeader() {fill(dbrown);
+    scribeHeader("Current paintbrush size: " + S.r);
+}
 void scribeHeader(String S) {text(S,10,20);} // writes on screen at line i
 void scribeHeaderRight(String S) {text(S,width-S.length()*15,20);} // writes on screen at line i
 void scribeFooter(String S) {text(S,10,height-10);} // writes on screen at line i

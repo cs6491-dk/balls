@@ -111,6 +111,7 @@ void draw() {
   if(showMesh&&showSilhouette) {stroke(dbrown); M.drawSilhouettes(); }  // display silhouettes
   camera(); // 2D view to write help text
   writeFooterHelp();
+  writeHeader();
   hint(ENABLE_DEPTH_TEST); // show silouettes
 
   // -------------------------------------------------------- SNAP PICTURE ---------------------------------- 
@@ -211,8 +212,9 @@ void keyPressed() {
   if(key=='(') {}
   if(key==')') {showSilhouette=!showSilhouette;}
   if(key=='_') {M.flatShading=!M.flatShading;}
-  if(key=='+') {M.flip();} // flip edge of M
-  if(key=='-') {S.r--;}
+  //if(key=='+') {M.flip();} // flip edge of M
+  if(key=='+') {S.r++;} // flip edge of M
+  if(key=='-') {if (S.r > 0){S.r--;}}
   if(key=='=') {}
   if(key=='{') {}
   if(key=='}') {}

@@ -837,7 +837,7 @@ Mesh loadMeshVTS(String fn) {
       if (nt == 0){ return false;}
       if (v1 == -1 | v2 == -1 | v3 == -1) {return false;}
       boolean retval = false;      
-      println("Compare " + v1 + "," + v2 + "," + v3);
+      //println("Compare " + v1 + "," + v2 + "," + v3);
       for (int i=0; i < nt; i++) {
         //println("i, nt " + i + "," + nt);
         //println("(loop) Compare " + V[3*i] + "," + V[3*i+1] + "," + V[3*i+2]);
@@ -852,7 +852,7 @@ Mesh loadMeshVTS(String fn) {
         //if (v1 == Vi2  && v2 == Vi1  && v3 == Vi) {retval = true; break;} // 2 1 0
         if (v1 == Vi2  && v2 == Vi  && v3 == Vi1) {retval = true; break;} // 2 0 1
       }
-      println("(is_triangle) retval: " + retval);
+      //println("(is_triangle) retval: " + retval);
       return retval;
     }
      
