@@ -45,6 +45,7 @@ class Sculpture {
     Hit hit = findFirstHit(V, D);      
     //println("delete " + hit.min_Adx);    
     Balls.remove(hit.min_Adx);
+    roll_skin(E, F);
   }
 
   Hit findFirstHit(vec V, Ball D) {

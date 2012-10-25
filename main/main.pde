@@ -21,6 +21,7 @@ Boolean
 pt F = P(0,0,0); pt T = P(0,0,0); pt E = P(0,0,1000); vec U=V(0,1,0);  // focus  set with mouse when pressing ';', eye, and up vector
 pt Q=P(0,0,0); vec I=V(1,0,0); vec J=V(0,1,0); vec K=V(0,0,1); // picked surface point Q and screen aligned vectors {I,J,K} set when picked
 void initView() {Q=P(0,0,0); I=V(1,0,0); J=V(0,1,0); K=V(0,0,1); F = P(0,0,0); E = P(0,0,1000); U=V(0,1,0); } // declares the local frames
+pt mouse_loc;
 
 // ******************************** MESHES ***********************************************
 Mesh M=new Mesh(); // meshes for models M0 and M1
@@ -48,7 +49,12 @@ void setup() {
   
 // ******************************************************************************************************************* DRAW      
 void draw() {  
+
+  
+  
   background(white);
+
+
   // -------------------------------------------------------- Help ----------------------------------
   if(showHelpText) {
     camera(); // 2D display to show cutout
@@ -62,15 +68,21 @@ void draw() {
   vec Li=U(A(V(E,F),0.1*d(E,F),J));   // vec Li=U(A(V(E,F),-d(E,F),J)); 
   directionalLight(255,255,255,Li.x,Li.y,Li.z); // direction of light: behind and above the viewer
   specular(255,255,0); shininess(5);
-
+  mouse_loc = Pick();
+  //show(mouse_loc, 100);
      // -------------------------------------------------------- show balls ---------------------------------
    if(showBalls) S.showBalls();
-   S.showBallCenters();
+         
+      
+   //S.showBallCenters();
    fill(black);
     
      // -------------------------------------------------------- show mesh ----------------------------------   
    if(showMesh) { fill(yellow); if(M.showEdges) stroke(red);  else noStroke(); M.showFront();} 
    
+    // --------------------------------------------------------- show painting ball-----------------------
+
+      
     // -------------------------- pick mesh corner ----------------------------------   
    if(pressed) if (keyPressed&&(key=='.')) M.pickc(Pick());
  
@@ -111,7 +123,7 @@ void draw() {
  // ****************************************************************************************************************************** INTERRUPTS
 Boolean pressed=false;
 
-void mousePressed() {pressed=true; }
+void mousePressed() {pressed=true;}
   
 void mouseDragged() {
   if(keyPressed&&key=='x') {M.add(float(mouseX-pmouseX),I).add(-float(mouseY-pmouseY),J); M.normals();} // move selected vertex in screen plane
@@ -150,8 +162,8 @@ void keyPressed() {
   if(key=='o') {}
   if(key=='p') {}
   if(key=='q') {S.manual_skin(E,F);}
-  if(key=='r') {S.deleteBall(E, F);M.resetCounters();S.roll_skin(E,F);}
-  if(key=='s') {S.addBall(E, F);}
+  if(key=='r') {S.deleteBall(E, mouse_loc);}
+  if(key=='s') {S.addBall(E, mouse_loc);}
   if(key=='t') {S.roll_skin(E, F);}
   if(key=='u') {}
   if(key=='v') {}
