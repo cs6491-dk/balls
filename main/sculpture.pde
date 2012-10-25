@@ -82,7 +82,10 @@ class Sculpture {
         if (require_kissed) {
           if (abs(V(A.c, B.c).norm2()-sq(A.r+B.r)) > 1e-3) continue;
         }
-        else if (d(A.c, B.c) > 2*dr) continue;
+        else if (roll_on_points) {
+          if (d(A.c, B.c) > 2*dr) continue;
+        }
+        else if (d(A.c, B.c) - A.r - B.r > 2*dr) continue;
 
         for (int Cdx=Bdx+1; Cdx < Balls.size(); Cdx++) {
           if (Cdx != Adx) {
@@ -91,7 +94,10 @@ class Sculpture {
             if (require_kissed) {
               if ((abs(V(A.c, C.c).norm2() - sq(A.r+C.r)) > 1e-3) || (abs(V(B.c, C.c).norm2() - sq(B.r+C.r)) > 1e-3)) continue;
             }
-            else if ((d(A.c, C.c) > 2*dr) || (d(B.c, C.c) > 2*dr)) continue;
+            else if (roll_on_points) {
+              if ((d(A.c, C.c) > 2*dr) || (d(B.c, C.c) > 2*dr)) continue;
+            }
+            else if ((d(A.c, C.c) - A.r - C.r > 2*dr) || (d(B.c, C.c) - B.r - C.r > 2*dr)) continue;
 
             sols = sphere_pack(A, B, C, dr, roll_on_points);
             for (int i=0; i < sols.size(); i++) {
@@ -105,7 +111,7 @@ class Sculpture {
                 test = Balls.get(jdx);
                 float threshold = dr;
                 if (!roll_on_points) threshold += test.r;
-                if (abs(d(Balls.get(jdx).c, sol) - threshold) < 1e-3) {
+                if (d(Balls.get(jdx).c, sol) - threshold < 1e-3) {
                   collision = true;
                   break;
                 }
@@ -164,7 +170,7 @@ class Sculpture {
           if ((jdx == Adx) || (jdx == Bdx) || (jdx == Cdx)) continue;
           test = Balls.get(jdx);
           float threshold = D.r;
-          if (abs(d(Balls.get(jdx).c, DP) - threshold) < 1e-3) {
+          if (d(Balls.get(jdx).c, DP) - threshold < 1e-3) {
             collision = true;
             break;
           }
@@ -422,7 +428,7 @@ class Sculpture {
     D.move(hit.min_t, V);
     Adx = hit.min_Adx;
 
-    min_sol = rollBall(Adx, D.r, D.c, true, false); //require kissed, don't roll on points
+    min_sol = rollBall(Adx, D.r, D.c, false, false); //require kissed, don't roll on points
     if (min_sol.sol == null) {
       println("No kisses");
       return;
