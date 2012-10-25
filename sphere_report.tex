@@ -79,6 +79,12 @@ The triangle described by the centers of these three balls is added to the mesh.
 
 The procedure is recursive: the roller rolls in three directions from the initial triangle, and in two directions from each subsequent triangle (excluding the direction from whence the roller came).
 Added triangles are compared to triangles already in the mesh, and when a duplicate triangle is found, the recursion terminates.
+\begin{figure}[!h]
+\centering
+\includegraphics[width=1.75in]{main/data/angle}
+\caption{Roller Ball Angle Calculation}
+\label{fig_angle}
+\end{figure}
 
 \section{Algorithms}
 The most significant algorithm work required determining the location of a ball D given the location of three balls A, B, C such that D is tangent to A, B, and C, or to the centers of those balls.
@@ -93,6 +99,12 @@ Adding a vector V of length $||DD'||$ and direction perpendicular to ABC yields 
 Since there are two directions perpendicular to ABC, there are two solutions to this problem.
 In general, the one that minimizes some angle will be preferred.
 
+This solution is outlined at http://www.had2know.com/academics/tetrahedron-volume-6-edges.html.
+
+\section{Future Work}
+A better canvas would make drawing easier.
+One possibility is a plane on which balls can be placed on, or a choice between several starting configurations.
+In addition, a toolbar style mode selection (Add Ball mode, Delete Ball mode) would make the application more user-friendly.
 
 %\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{main/data/dsmith.png}}]{Donnie Smith} donnie.smith@gatech.edu
 %\end{IEEEbiography}
