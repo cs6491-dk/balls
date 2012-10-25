@@ -15,6 +15,7 @@ class Sculpture {
 
   ArrayList<Ball> Balls;
   float r=20;
+  
   Ball roller = null;
 
   Sculpture() {
@@ -241,7 +242,7 @@ class Sculpture {
     RollSol min_sol;
 
     // add a large ball
-    Ball D = new Ball(P(E), r*1.5);
+    Ball D = new Ball(P(E), ROLL_BALL_SIZE);
     //Balls.add(D);
 
     // define the vector we are looking through
@@ -323,7 +324,7 @@ class Sculpture {
     // add a large ball
     if (roller == null) {
       println("adding roller");
-      roller = new Ball(P(E), r*1.5);
+      roller = new Ball(P(E), ROLL_BALL_SIZE);
       //Balls.add(roller);
     }
     else {

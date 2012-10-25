@@ -23,6 +23,10 @@ pt Q=P(0,0,0); vec I=V(1,0,0); vec J=V(0,1,0); vec K=V(0,0,1); // picked surface
 void initView() {Q=P(0,0,0); I=V(1,0,0); J=V(0,1,0); K=V(0,0,1); F = P(0,0,0); E = P(0,0,1000); U=V(0,1,0); } // declares the local frames
 pt mouse_loc;
 
+//*** CONSTANTS **
+int MAX_ADDED_BALL_SIZE = 20;
+int ROLL_BALL_SIZE = 2*MAX_ADDED_BALL_SIZE;
+
 // ******************************** MESHES ***********************************************
 Mesh M=new Mesh(); // meshes for models M0 and M1
 Sculpture S = new Sculpture();
@@ -213,7 +217,7 @@ void keyPressed() {
   if(key==')') {showSilhouette=!showSilhouette;}
   if(key=='_') {M.flatShading=!M.flatShading;}
   //if(key=='+') {M.flip();} // flip edge of M
-  if(key=='+') {S.r++;} // flip edge of M
+  if(key=='+') {if (S.r < MAX_ADDED_BALL_SIZE) {S.r++;}} // flip edge of M
   if(key=='-') {if (S.r > 0){S.r--;}}
   if(key=='=') {}
   if(key=='{') {}
