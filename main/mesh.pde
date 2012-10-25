@@ -846,10 +846,10 @@ Mesh loadMeshVTS(String fn) {
         Vi1 = V[3*i+1];
         Vi2 = V[3*i+2];
         if (v1 == Vi   && v2 == Vi1  && v3 == Vi2) {retval = true; break;} // 0 1 2
-        if (v1 == Vi   && v2 == Vi2  && v3 == Vi1) {retval = true; break;} // 0 2 1
-        if (v1 == Vi1  && v2 == Vi   && v3 == Vi2) {retval = true; break;} //  1 0 2
+        //if (v1 == Vi   && v2 == Vi2  && v3 == Vi1) {retval = true; break;} // 0 2 1
+        //if (v1 == Vi1  && v2 == Vi   && v3 == Vi2) {retval = true; break;} //  1 0 2
         if (v1 == Vi1  && v2 == Vi2  && v3 == Vi) {retval = true; break;} // 1 2 0
-        if (v1 == Vi2  && v2 == Vi1  && v3 == Vi) {retval = true; break;} // 2 1 0
+        //if (v1 == Vi2  && v2 == Vi1  && v3 == Vi) {retval = true; break;} // 2 1 0
         if (v1 == Vi2  && v2 == Vi  && v3 == Vi1) {retval = true; break;} // 2 0 1
       }
       println("(is_triangle) retval: " + retval);
