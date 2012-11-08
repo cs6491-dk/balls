@@ -23,9 +23,7 @@ pt Q=P(0,0,0); vec I=V(1,0,0); vec J=V(0,1,0); vec K=V(0,0,1); // picked surface
 void initView() {Q=P(0,0,0); I=V(1,0,0); J=V(0,1,0); K=V(0,0,1); F = P(0,0,0); E = P(0,0,1000); U=V(0,1,0); } // declares the local frames
 pt mouse_loc;
 
-//*** CONSTANTS **
-int MAX_ADDED_BALL_SIZE = 20;
-int ROLL_BALL_SIZE = 2*MAX_ADDED_BALL_SIZE;
+
 
 // ******************************** MESHES ***********************************************
 Mesh M=new Mesh(); // meshes for models M0 and M1
@@ -33,9 +31,13 @@ Sculpture S = new Sculpture();
 
 float sampleDistance=1;
 
+//*** CONSTANTS **
+int MAX_ADDED_BALL_SIZE = 20;
+float ROLL_BALL_SIZE = 2*MAX_ADDED_BALL_SIZE;
+
 // *******************************************************************************************************************    SETUP
 void setup() {
-  size(800, 800, OPENGL);  
+  size(800, 600, OPENGL);  
   setColors(); sphereDetail(20);
   PFont font = loadFont("GillSans-24.vlw"); textFont(font, 20);  // font for writing labels on //  PFont font = loadFont("Courier-14.vlw"); textFont(font, 12); 
   // ***************** OpenGL and View setup

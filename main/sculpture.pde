@@ -29,7 +29,7 @@ class Sculpture {
     for (int i=0; i < Balls.size(); i++) {
       Balls.get(i).showPoint();
     }
-  }
+  }  
   
   void showBalls() {
     for (int i=0; i < Balls.size(); i++) {
@@ -44,8 +44,10 @@ class Sculpture {
     vec V = V(E, F);
 
     Hit hit = findFirstHit(V, D);      
-    //println("delete " + hit.min_Adx);    
+    //println("delete " + hit.min_Adx);  
+    if (hit.min_Adx != -1){  
     Balls.remove(hit.min_Adx);
+    }
     roll_skin(E, F);
   }
 
